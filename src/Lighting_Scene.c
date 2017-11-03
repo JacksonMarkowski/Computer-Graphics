@@ -3,7 +3,7 @@
  * Basic code pieces/structure taken from CSCIx229 by Willem A. (Vlakkies) Schreuder
  */ 
 int printInfo=0;
-int axes=0;       //  Display axes
+int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
 int move=1;       //  Move light
 int th=40;         //  Azimuth of view angle
@@ -71,279 +71,48 @@ static void ball(double x,double y,double z,double r) {
 }
 
 
-//Draws a frustum with a give bottom and top radius and number of radians between each vertex
-static void frustum(double x,double y,double z,
-                     double r1, double r2, double height, 
-                     double tx, double ty, double tz,
-                     double rad) {
-   double i;
-   //double twoPi = 2 * M_PI;
-
-   //Calculates the max radius for scaling
-   double max = (((r1) > (r2)) ? (r1) : (r2));
-   //Normalizes the two radius values
-   double r1Norm = r1/max;
-   double r2Norm = r2/max;
-
-   double normalY = atan((r1-r2)/height)*2/3.1415926;
-
+//Draws a panel
+static void panel(double x,double y,double z,
+                     double dx, double dy, double dz, 
+                     double tx, double ty, double tz) {
    glPushMatrix();
    glTranslated(x,y,z);
    glRotated(tx,1,0,0);
    glRotated(ty,0,1,0);
    glRotated(tz,0,0,1);
-   glScaled(max,height,max);
+   glScaled(dx,dy,dz);
 
-   //Draws the frustum by drawing the next vertex rad over
-   glBegin(GL_QUAD_STRIP);
-   for (i = 0; i <= 360; i += rad) {
-      //double color = (cos(i)*cos(i) + 1) / 2;
-      //glColor3f(color, color, color);
-      glNormal3d(Cos(i),normalY,Sin(i));
-      glVertex3d(Cos(i) * r2Norm, 1, Sin(i) * r2Norm);
+   glColor3f(.6, .6, .6);
 
-      //glNormal3d(Cos(i),1,Sin(i));
-      glVertex3d(Cos(i) * r1Norm, 0, Sin(i) * r1Norm);
-   }
-   glNormal3d(Cos(0),normalY, Sin(0));
-   glVertex3d(Cos(0) * r2Norm, 1, Sin(0) * r2Norm);
-   glVertex3d(Cos(0) * r1Norm, 0, Sin(0) * r1Norm);
-   glEnd();
-
-   glPopMatrix();
-}
-
-//Draws the top and bottom of a frustum
-static void frustumTopBottom(double x,double y,double z,
-                     double r1, double r2, double height, 
-                     double tx, double ty, double tz,
-                     double rad) {
-
-   double i;
-   double twoPi = 2 * M_PI;
-
-   //Calculates the max radius for scaling
-   double max = (((r1) > (r2)) ? (r1) : (r2));
-   //Normalizes the two radius values
-   double r1Norm = r1/max;
-   double r2Norm = r2/max;
-
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glRotated(ty,0,1,0);
-   glRotated(tz,0,0,1);
-   glScaled(max,height,max);
-
-   glBegin(GL_TRIANGLE_FAN);
-   glNormal3d(0,1,0);
-   for (i = 0; i <= twoPi; i += rad) {
-      glVertex3d(cos(i) * r2Norm, 1, sin(i) * r2Norm);
-   }
-   glVertex3d(cos(0) * r2Norm, 1, sin(0) * r2Norm);
-   glEnd();
-
-   glBegin(GL_TRIANGLE_FAN);
-   glNormal3d(0,-1,0);
-   for (i = 0; i <= twoPi; i += rad) {
-      glVertex3d(cos(i) * r1Norm, 0, sin(i) * r1Norm);
-   }
-   glVertex3d(cos(0) * r1Norm, 0, sin(0) * r1Norm);
-   glEnd();
+   double i, j;
+   double d = 5.0, d2 = .05;
    
+   for (j = 0; j < 1; j += d2) {
+      double r1 = 2 - j;
+      double r2 = 2 - j+d2;
 
-   glPopMatrix();
-}
-
-//Draws a dome, code modified from ex8
-static void dome(double x,double y,double z,double r)
-{
-   const int d=5;
-   int th,ph;
-
-   //  Save transformation
-   glPushMatrix();
-   //  Offset and scale
-   glTranslated(x,y,z);
-   glScaled(r,r,r);
-
-   //  Latitude bands
-   for (ph=0;ph<=90-2*d;ph+=d)
-   {
+      double normal1 = atan(2 * sqrt(j+d2+1)) / 1.5707;
+      double normal2 = atan(2 * sqrt(j+d2)) / 1.5707;
+      //printf("%f %f ", r1, r2);
       glBegin(GL_QUAD_STRIP);
-      for (th=0;th<=360;th+=d)
-      {
-         glNormal3d(Sin(th)*Cos(ph) , Sin(ph) , Cos(th)*Cos(ph));
-         glVertex3d(Sin(th)*Cos(ph) , Sin(ph) , Cos(th)*Cos(ph));
-         glNormal3d(Sin(th)*Cos(ph+d) , Sin(ph+d) , Cos(th)*Cos(ph+d));
-         glVertex3d(Sin(th)*Cos(ph+d) , Sin(ph+d) , Cos(th)*Cos(ph+d));
+      for (i = 0; i <= 36; i += d) {
+         
+         glNormal3d(Cos(i),normal1,Sin(i));
+         glVertex3d(Cos(i) * r1, pow(j+d2+1,0.5)-1, Sin(i) * r1);
+
+         glNormal3d(Cos(i),normal1,Sin(i));
+         glVertex3d(Cos(i) * r2, pow(j+1,0.5)-1, Sin(i) * r2);
       }
       glEnd();
    }
-
-   //  North pole cap
-   glBegin(GL_TRIANGLE_FAN);
-   glVertex3d(Sin(0)*Cos(90) , Sin(90) , Cos(0)*Cos(90));
-   for (th=0;th<=360;th+=d)
-   {
-      glNormal3d(0 , 1 , 0);
-      glVertex3d(Sin(th)*Cos(90-d) , Sin(90-d) , Cos(th)*Cos(90-d));
-   }
-   glEnd();
-
-   //  Undo transformations
-   glPopMatrix();
-}
-
-//Draws a circular window
-static void window(double x,double y, double z,
-                  double dx,double dy,double dz,
-                  double tx, double ty, double tz) {
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glRotated(ty,0,1,0);
-   glRotated(tz,0,0,1);
-   glScaled(dx,dy,dz);
-
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-   float Emission2[]  = {0.0,0.0,.2,1.0};
-
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   glColor3f(.95,.95,.95);
-   frustum(0, 0, 0, .6, .6, .5 , 0, 0, 0, .1);
-   frustumTopBottom(0, 0, 0, .6, .6, .5 , 0, 0, 0, .1);
-
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission2);
-   glColor3f(.678,.847,.902);
-   frustum(0, 0, 0, 1, 1, .2, 0, 0, 0, .1);
-   frustumTopBottom(0, 0, 0, 1, 1, .2, 0, 0, 0, .1);
-
-   glPopMatrix();
-   
-}
-
-//Draws one side of the spaceship saucer
-static void wing(double x,double y,double z,
-                  double dx,double dy,double dz,
-                  double tx)
-{
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glScaled(dx,dy,dz);
-
-   frustum(0 ,0 , 0 , 1, .95, .25, 0, 0, 0, .05);
-   frustum(0, .25, 0, .95, .85, .25, 0, 0, 0, .05);
-   frustum(0, .5, 0, .85, .7, .25, 0, 0, 0, .05);
-   frustum(0, .75, 0, .7, .5, .25, 0, 0, 0, .05);
-   
-   glPopMatrix();
-}
-
-//Draws the legs of the spaceship
-static void leg(double x,double y, double z,
-                  double dx,double dy,double dz,
-                  double tx, double ty, double tz) {
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glRotated(ty,0,1,0);
-   glRotated(tz,0,0,1);
-   glScaled(dx,dy,dz);
-
-   //Leg1
-   glColor3f(.757,.757,.757);
-   frustum(0, -.35, 0, 1, 1, .35, 0, 0, 0, .1);
-   frustumTopBottom(0, -.35, 0, 1, 1, .35, 0, 0, 0, .1);
-
-   //Leg2
-   glColor3f(.787,.787,.787);
-   frustum(0, -.85, 0, .8, .8, .5, 0, 0, 0, .1);
-   frustumTopBottom(0, -.85, 0, .8, .8, .5, 0, 0, 0, .1);
-
-   //Leg3
-   glColor3f(.817,.817,.817);
-   frustum(0, -1.60, 0, .55, .55, .75, 0, 0, 0, .1);
-   frustumTopBottom(0, -1.60, 0, .55, .55, .75, 0, 0, 0, .1);
-
-   glPopMatrix();
-
-}
-
-//Draws a spaceship at the specified cordinates
-static void spaceship(double x,double y,double z,
-                  double dx,double dy,double dz, 
-                  double tx, double ty, double tz, int extendedLegs)
-{
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glRotated(ty,0,1,0);
-   glRotated(tz,0,0,1);
-   glScaled(dx,dy,dz);
-
-   float yellow[] = {0.0,0.0,1.0,1.0};
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-   float Emission2[]  = {0.0,0.0,.2,1.0};
-
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   glMaterialf(GL_FRONT,GL_SHININESS,shiny);
-   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-   //Top wing
-   glColor3f(.827,.827,.827);
-   wing(0, 0, 0, 1, .2, 1, 0);
-
-   //dome
-   dome(0,.15,0,.5);
-   
-   //White band between top and bottom wings
-   glColor3f(.895,.895,.895);
-   frustum(0, -.05, 0, 1, 1, .05, 0, 0, 0, .05);
-
-   //Blue band between top and bottom wings
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission2);
-   glColor3f(.678,.847,.902);
-   frustum(0, -.0375, 0, 1.02, 1.02, .025, 0, 0, 0, .05);
-   frustumTopBottom(0, -.0375, 0, 1.02, 1.02, .025, 0, 0, 0, .05);
-
-   //Bottom wing
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   glColor3f(.735,.735,.735);
-   wing(0, -.05, 0, 1, .2, 1, 180);
-
-   //Bottom thing
-   glColor3f(.672,.672,.672);
-   frustum(0, -.35, 0, .4, .5, .1, 0, 0, 0, .05);
-   frustumTopBottom(0, -.35, 0, .4, .5, .1, 0, 0, 0, .05);
-   glColor3f(.652,.652,.652);
-   frustum(0, -.425, 0, .2, .3, .075, 0, 0, 0, .05);
-   frustumTopBottom(0, -.425, 0, .2, .3, .075, 0, 0, 0, .05);
-
-   //Bottom thing blue bands
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission2);
-   glColor3f(.678,.780,.871);
-   frustum(0, -.27, 0, .5, .502, .02, 0, 0, 0, .05);
-   frustum(0, -.37, 0, .3, .302, .02, 0, 0, 0, .05);
-
-   
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   //legs
-   if (extendedLegs) {
-      leg(0,-.15,.5,.05,.5,.05,-15,0,0);
-      leg(.433,-.15,-.25,.05,.5,.05,0,30,15);
-      leg(-.433,-.15,-.25,.05,.5,.05,0,150,15);
-   }
-
-   //Windows
-   int i;
-   for (i=0; i<360; i+=30) {
-      window(.433 * Cos(i),.4,.433 * Sin(i),.05,.05,.05,0,-i,-60);
-   }
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
+   //glNormal3d(Cos(0),normalY, Sin(0));
+   //glVertex3d(Cos(0) * r2Norm, 1, Sin(0) * r2Norm);
+   //glVertex3d(Cos(0) * r1Norm, 0, Sin(0) * r1Norm);
 
    glPopMatrix();
 }
+
+
 
 
 /*
@@ -409,7 +178,15 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
-   spaceship(0, 0, 0, 1, 1, 1, 0, 0, 0, 1);
+   panel(0,0,0,1,1,1,0,0,0);
+   panel(0,0,0,1,1,1,0,40,0);
+   panel(0,0,0,1,1,1,0,80,0);
+   panel(0,0,0,1,1,1,0,120,0);
+   panel(0,0,0,1,1,1,0,160,0);
+   panel(0,0,0,1,1,1,0,200,0);
+   panel(0,0,0,1,1,1,0,240,0);
+   panel(0,0,0,1,1,1,0,280,0);
+   panel(0,0,0,1,1,1,0,320,0);
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
