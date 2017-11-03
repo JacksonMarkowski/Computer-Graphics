@@ -1,4 +1,5 @@
 #include "CSCIx229.h"
+#include "Spaceship.c"
 /*
  * Basic code pieces/structure taken from CSCIx229 by Willem A. (Vlakkies) Schreuder
  */ 
@@ -71,47 +72,6 @@ static void ball(double x,double y,double z,double r) {
 }
 
 
-//Draws a panel
-static void panel(double x,double y,double z,
-                     double dx, double dy, double dz, 
-                     double tx, double ty, double tz) {
-   glPushMatrix();
-   glTranslated(x,y,z);
-   glRotated(tx,1,0,0);
-   glRotated(ty,0,1,0);
-   glRotated(tz,0,0,1);
-   glScaled(dx,dy,dz);
-
-   glColor3f(.6, .6, .6);
-
-   double i, j;
-   double d = 5.0, d2 = .05;
-   
-   for (j = 0; j < 1; j += d2) {
-      double r1 = 2 - j;
-      double r2 = 2 - j+d2;
-
-      double normal1 = atan(2 * sqrt(j+d2+1)) / 1.5707;
-      double normal2 = atan(2 * sqrt(j+d2)) / 1.5707;
-      //printf("%f %f ", r1, r2);
-      glBegin(GL_QUAD_STRIP);
-      for (i = 0; i <= 36; i += d) {
-         
-         glNormal3d(Cos(i),normal1,Sin(i));
-         glVertex3d(Cos(i) * r1, pow(j+d2+1,0.5)-1, Sin(i) * r1);
-
-         glNormal3d(Cos(i),normal1,Sin(i));
-         glVertex3d(Cos(i) * r2, pow(j+1,0.5)-1, Sin(i) * r2);
-      }
-      glEnd();
-   }
-   //glNormal3d(Cos(0),normalY, Sin(0));
-   //glVertex3d(Cos(0) * r2Norm, 1, Sin(0) * r2Norm);
-   //glVertex3d(Cos(0) * r1Norm, 0, Sin(0) * r1Norm);
-
-   glPopMatrix();
-}
-
 
 
 
@@ -178,15 +138,7 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
-   panel(0,0,0,1,1,1,0,0,0);
-   panel(0,0,0,1,1,1,0,40,0);
-   panel(0,0,0,1,1,1,0,80,0);
-   panel(0,0,0,1,1,1,0,120,0);
-   panel(0,0,0,1,1,1,0,160,0);
-   panel(0,0,0,1,1,1,0,200,0);
-   panel(0,0,0,1,1,1,0,240,0);
-   panel(0,0,0,1,1,1,0,280,0);
-   panel(0,0,0,1,1,1,0,320,0);
+   drawSpaceship();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
