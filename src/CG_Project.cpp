@@ -26,6 +26,8 @@ float shiny   =   1;  // Shininess (value)
 int zh        =  90;  // Light azimuth
 float ylight  =   0;  // Elevation of light
 
+int metalTex;
+
 Spaceship mainSpaceship;
 
 /*
@@ -82,6 +84,9 @@ void display() {
    //  Enable Z-buffering in OpenGL
    glEnable(GL_DEPTH_TEST);
 
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
    //  Undo previous transformations
    glLoadIdentity();
    //  Perspective - set eye position
@@ -135,7 +140,7 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
-   mainSpaceship.drawSpaceship();
+   mainSpaceship.draw();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -345,6 +350,7 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
+   mainSpaceship.loadTex();
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();

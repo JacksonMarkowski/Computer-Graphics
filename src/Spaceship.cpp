@@ -22,48 +22,59 @@ struct Trans3d {
 
 class Spaceship {
 	private:
-		void drawWingPanel(Trans3d transform);
-		void drawWingPanelSideEdge(Trans3d transform, double normal);
-		void drawWingPanelInsideEdge(Trans3d transform);
-		void drawWingPanelOutsideEdge(Trans3d transform);
-		void drawWingBase(Trans3d transform, double upToj);
-		void drawDomePanel(Trans3d transform);
-		void drawDomeRing(Trans3d transform);
-		void drawCenterRing(Trans3d transform);
-		void drawBottomOpening(Trans3d transform);
-		void drawBottomOpeningRing(Trans3d transform);
+		int metal1Tex, metal2Tex, domeRingTex;
 		void applyTrans3d(Trans3d transform);
+		void drawWingPanel(Trans3d transform, int texture);
+		void drawWingPanelSideEdge(Trans3d transform, int texture, double normal);
+		void drawWingPanelInsideEdge(Trans3d transform, int texture);
+		void drawWingPanelOutsideEdge(Trans3d transform, int texture);
+		void drawWingBase(Trans3d transform, int texture, double upToj);
+		void drawDomePanel(Trans3d transform, int texture);
+		void drawDomeRing(Trans3d transform, int texture);
+		void drawCenterRing(Trans3d transform, int texture);
+		void drawBottomOpening(Trans3d transform, int texture);
+		void drawBottomOpeningRing(Trans3d transform, int texture);
 
 		void quadStripRotation(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY);
+		void quadStripRotationTex(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY, double r1Tex, double r2Tex);
 	public:
 		Spaceship();
-		void drawSpaceship();
+		void draw();
+		void loadTex();
 };
 
 Spaceship::Spaceship() {
-	//Default Conts.
+	//metalTex = LoadTexBMP("Metal.bmp");
 }
 
-void Spaceship::drawSpaceship() {
+void Spaceship::draw() {
 	int i;
 	
-	for(i = 0; i < 360; i+=44) {
-		drawWingPanel(Trans3d (0,0,0,1,1,1,0,i,0));
-		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i,0), -1);
-		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i-36,0), 1);
-		drawWingPanelInsideEdge(Trans3d (0,0,0,1,1,1,0,i,0));
-		drawWingPanelOutsideEdge(Trans3d (0,0,0,1,1,1,0,i,0));
-		drawDomePanel(Trans3d (0,.42,0,.8,.6,.8,0,i,0));
+	for(i = 0; i < 360; i+=45) {
+		drawWingPanel(Trans3d (0,0,0,1,1,1,0,i,0), metal1Tex);
+		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metal1Tex, -1);
+		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i-36,0), metal1Tex, 1);
+		drawWingPanelInsideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metal1Tex);
+		drawWingPanelOutsideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metal1Tex);
+		drawDomePanel(Trans3d (0,.42,0,.8,.6,.8,0,i,0), metal1Tex);
 	}
-	drawWingBase(Trans3d (0,-.1,0,1,1,1,0,0,0), 1.0);
-	drawDomeRing(Trans3d (0,.37,0,1,1,1,0,0,0));
-	drawCenterRing(Trans3d (0,-.2,0,1,1,1,0,0,0));
+	quadStripRotation(0,360,4.0,0,.081,.998,.989,.97);
+	drawWingBase(Trans3d (0,-.1,0,1,1,1,0,0,0), metal1Tex, 1.0);
+	drawDomeRing(Trans3d (0,.37,0,1,1,1,0,0,0), domeRingTex);
+	drawCenterRing(Trans3d (0,-.2,0,1,1,1,0,0,0), metal1Tex);
 
-	drawWingBase(Trans3d (0,-.2,0,1,.5,1,180,0,0), .7);
-	drawWingBase(Trans3d (0,-.35,0,.66,.5,.66,180,0,0), .8);
+	drawWingBase(Trans3d (0,-.2,0,1,.5,1,180,0,0), metal1Tex, .7);
+	drawWingBase(Trans3d (0,-.35,0,.66,.5,.66,180,0,0), metal1Tex, .8);
 
-	drawBottomOpening(Trans3d (0,-.51,0,.41,.5,.41,180,0,0));
-	drawBottomOpeningRing(Trans3d (0,-.51,0,.82,1,.82,180,0,0));
+	drawBottomOpening(Trans3d (0,-.51,0,.41,.5,.41,180,0,0), metal1Tex);
+	drawBottomOpeningRing(Trans3d (0,-.51,0,.82,1,.82,180,0,0), metal1Tex);
+
+}
+
+void Spaceship::loadTex() {
+	metal1Tex = LoadTexBMP("../textures/Metal4.bmp");
+	metal2Tex = LoadTexBMP("../textures/Metal2.bmp");
+	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
 }
 
 void Spaceship::applyTrans3d(Trans3d transform) {
@@ -74,11 +85,15 @@ void Spaceship::applyTrans3d(Trans3d transform) {
 	glScaled(transform.scale.x,transform.scale.y,transform.scale.z);
 }
 
-void Spaceship::drawWingPanel(Trans3d transform) {
+void Spaceship::drawWingPanel(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
 
-	glColor3f(.6, .6, .6);
+	glColor3f(1, 1, 1);
+
+	glMaterialf(GL_FRONT,GL_SHININESS,128);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 
 	double j;
 	double d = .05;
@@ -90,15 +105,19 @@ void Spaceship::drawWingPanel(Trans3d transform) {
 		double y2 = pow(j+d+1,0.5)-1;
 		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
 
-		quadStripRotation(0,36,4.0,r1,r2,y1,y2,normalY);
+		quadStripRotationTex(0,36,4.0,r1,r2,y1,y2,normalY, r1/2, r2/2);
 	}
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
-void Spaceship::drawWingPanelSideEdge(Trans3d transform, double normal) {
+void Spaceship::drawWingPanelSideEdge(Trans3d transform, int texture, double normal) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	//glEnable(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D,texture);
 
 	double j;
 	double d2 = .05;
@@ -120,12 +139,17 @@ void Spaceship::drawWingPanelSideEdge(Trans3d transform, double normal) {
 	glVertex3d(2.05, -.11, 0);
 	glEnd();
 
+	//glDisable(GL_TEXTURE_2D);
+
 	glPopMatrix();
 }
 
-void Spaceship::drawWingPanelInsideEdge(Trans3d transform) {
+void Spaceship::drawWingPanelInsideEdge(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	//glEnable(GL_TEXTURE_2D);
+	//glBindTexture(GL_TEXTURE_2D,texture);
 
 	double i;
 	double j = 1;
@@ -145,12 +169,17 @@ void Spaceship::drawWingPanelInsideEdge(Trans3d transform) {
 	}
 	glEnd();
 
+	//glDisable(GL_TEXTURE_2D);
+
 	glPopMatrix();
 }
 
-void Spaceship::drawWingPanelOutsideEdge(Trans3d transform) {
+void Spaceship::drawWingPanelOutsideEdge(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 
 	double j = 0;
   	double r1 = 2 - j;
@@ -159,14 +188,19 @@ void Spaceship::drawWingPanelOutsideEdge(Trans3d transform) {
   	double y1 = yVer - 1;
   	double y2 = yVer - 1.11;
    
-  	quadStripRotation(0,36,4.0,r1,r2,y1,y2,.705);
+  	quadStripRotationTex(0,36,4.0,r1,r2,y1,y2,.705, r1/2, r2/2);
+
+  	glDisable(GL_TEXTURE_2D);
 
   	glPopMatrix();
 }
 
-void Spaceship::drawWingBase(Trans3d transform, double upToj) {
+void Spaceship::drawWingBase(Trans3d transform, int texture, double upToj) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 	
 	glColor3f(.4, .4, .4);	
 	double j;
@@ -179,15 +213,20 @@ void Spaceship::drawWingBase(Trans3d transform, double upToj) {
 		double y2 = pow(j+d+1,0.5)-1;
 		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
 
-		quadStripRotation(0,360,4.0,r1,r2,y1,y2,normalY);
+		quadStripRotationTex(0,360,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);
 	}
+
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
-void Spaceship::drawDomePanel(Trans3d transform) {
+void Spaceship::drawDomePanel(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 	
 	glColor3f(.6, .6, .6);
 
@@ -201,16 +240,20 @@ void Spaceship::drawDomePanel(Trans3d transform) {
 		double y2 = pow(j+d,0.5);
 		double normalY = atan(2 * sqrt(j+d)) / 1.5707;
       
-		quadStripRotation(0,44,4.0,r1,r2,y1,y2,normalY);
-
+		quadStripRotationTex(0,45,5.0,r1,r2,y1,y2,normalY,r1,r2);
 	}
+
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
-void Spaceship::drawDomeRing(Trans3d transform) {
+void Spaceship::drawDomeRing(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 	
 	glColor3f(.4, .4, .4);
 
@@ -218,34 +261,62 @@ void Spaceship::drawDomeRing(Trans3d transform) {
 	double r2 = .8;
 	double r3 = 1.1;
 
-	quadStripRotation(0,360,4.0,r1,r2,0,.05,.844);
-	quadStripRotation(0,360,4.0,r1,r3,0,-.0915,.472);
+	quadStripRotationTex(0,360,4.0,r1,r2,0,.05,.844,1,.5);
+	glDisable(GL_TEXTURE_2D);
+	
+	glBindTexture(GL_TEXTURE_2D,texture);
+	quadStripRotationTex(0,360,4.0,r1,r3,0,-.0915,.472,1,.9);
+
+	glDisable(GL_TEXTURE_2D);
    
 	glPopMatrix();
 }
 
-void Spaceship::drawCenterRing(Trans3d transform) {
+void Spaceship::drawCenterRing(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 	
 	glColor3f(.4, .4, .4);
 
 	double r1 = 2;
 	double r2 = 2.05;
        
-	quadStripRotation(0,360,4.0,r1,r2,.1,.09,.874);
-	quadStripRotation(0,360,4.0,r2,r1,.09,.05,-.57);
-	quadStripRotation(0,360,4.0,r1,r2,.05,.01,.57);
-	quadStripRotation(0,360,4.0,r2,r1,.01,0,-.874);
+	quadStripRotationTex(0,360,4.0,r1,r2,.1,.09,.874,2/2.05,1);
+	quadStripRotationTex(0,360,4.0,r2,r1,.09,.05,-.57,1,2/2.05);
+	quadStripRotationTex(0,360,4.0,r1,r2,.05,.01,.57,2/2.05,1);
+	quadStripRotationTex(0,360,4.0,r2,r1,.01,0,-.874,1,2/2.05);
+
+	glDisable(GL_TEXTURE_2D);
+
+	glColor4f(.65, .929, .905, .5);
+	for (double i = 13.25; i < 360; i+=22.5) {
+		for (double j = 0; j <= 8; j += 4) {
+
+			quadStripRotation(i+j,i+j+1.5,.75,2.0125,2.0125,.06,.04,0);
+			/*
+			glBegin(GL_TRIANGLES);
+			glVertex3d(Cos(i+j)*2.0125, .06, Sin(i+j)*2.0125);
+			glVertex3d(Cos(i+j)*2.0125, .04, Sin(i+j)*2.0125);
+			glVertex3d(Cos(i+j)*2, .05, Sin(i+j)*2);
+			glEnd();*/
+		}
+	}
+	glDisable(GL_TEXTURE_2D);
    
 	glPopMatrix();
 }
 
-void Spaceship::drawBottomOpening(Trans3d transform) {
+void Spaceship::drawBottomOpening(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
 	
 	glColor3f(.4, .4, .4);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 
 	double j;
 	double d = .05;
@@ -257,7 +328,7 @@ void Spaceship::drawBottomOpening(Trans3d transform) {
 		double y2 = pow(j+d+1,0.5)-1;
 		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
 
-		quadStripRotation(0,360,4.0,r1,r2,y1,y2,normalY);
+		quadStripRotationTex(0,360,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);
 	}
 
 	for (j = .2; j < .8; j += d) {
@@ -269,10 +340,18 @@ void Spaceship::drawBottomOpening(Trans3d transform) {
 
   		double z;
   		for (z = 0; z < 360; z+=72) {
-			quadStripRotation(0+z,32+z,4.0,r1,r2,y1,y2,normalY);		
+  			glColor3f(.4, .4, .4);
+  			glEnable(GL_TEXTURE_2D);
+			quadStripRotationTex(0+z,32+z,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);
+			glDisable(GL_TEXTURE_2D);
+
+			glColor4f(.768, .16, .05, .3);
+			quadStripRotation(32+z,72+z,4.0,r1,r2,y1,y2,normalY);		
 		}
 	}
 
+	glColor3f(.4, .4, .4);
+	glEnable(GL_TEXTURE_2D);
 	for (j = .8; j < 1; j += d) {
 		double r1 = 2 - j;
 		double r2 = 2 - (j+d);
@@ -280,22 +359,29 @@ void Spaceship::drawBottomOpening(Trans3d transform) {
 		double y2 = pow(j+d+1,0.5)-1;
 		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
       
-		quadStripRotation(0,360,4.0,r1,r2,y1,y2,normalY);		
+		quadStripRotationTex(0,360,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);		
 	}
+
+	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
-void Spaceship::drawBottomOpeningRing(Trans3d transform) {
+void Spaceship::drawBottomOpeningRing(Trans3d transform, int texture) {
 	glPushMatrix();
 	applyTrans3d(transform);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,texture);
 	
 	glColor3f(.4, .4, .4);
 
 	double r1 = 1;
 	double r2 = .1;
    
-	quadStripRotation(0,360,4.0,r1,r2,0,.05,.96);	
+	quadStripRotationTex(0,360,4.0,r1,r2,0,.05,.96,r1,r2);	
+
+	glDisable(GL_TEXTURE_2D);
    
 	glPopMatrix();
 }
@@ -310,7 +396,18 @@ void Spaceship::quadStripRotation(double startDegree, double endDegree, double i
 		glVertex3d(Cos(i) * r2, y2, Sin(i) * r2);
 	}
 	glEnd();
+	glTexCoord2f(i/360, 1.0);
 }
 
+void Spaceship::quadStripRotationTex(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY, double r1Tex, double r2Tex) {
+	double i;
 
+	glBegin(GL_QUAD_STRIP);
+	for (i = startDegree; i <= endDegree; i += incDegree) {
+		glNormal3d(Cos(i),normalY,Sin(i));
+		glTexCoord2f((Cos(i) * r1Tex / 2.0 + .5), (Sin(i) * r1Tex / 2.0 + .5)); glVertex3d(Cos(i) * r1, y1, Sin(i) * r1);
+		glTexCoord2f((Cos(i) * r2Tex / 2.0 + .5), (Sin(i) * r2Tex / 2.0 + .5)); glVertex3d(Cos(i) * r2, y2, Sin(i) * r2);
+	}
+	glEnd();
+}
 
