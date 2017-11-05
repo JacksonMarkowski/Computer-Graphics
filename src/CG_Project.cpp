@@ -1,12 +1,10 @@
 #include "CSCIx229.h"
-#include "Spaceship.c"
-/*
- * Basic code pieces/structure taken from CSCIx229 by Willem A. (Vlakkies) Schreuder
- */ 
+#include "Spaceship.cpp"
+
 int printInfo=0;
 int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
-int move=1;       //  Move light
+int move2=1;       //  Move light
 int th=40;         //  Azimuth of view angle
 int ph=25;         //  Elevation of view angle
 int fov=55;       //  Field of view (for perspective)
@@ -27,6 +25,8 @@ int shininess =   1;  // Shininess (power of two)
 float shiny   =   1;  // Shininess (value)
 int zh        =  90;  // Light azimuth
 float ylight  =   0;  // Elevation of light
+
+Spaceship mainSpaceship;
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -70,9 +70,6 @@ static void ball(double x,double y,double z,double r) {
    //  Undo transofrmations
    glPopMatrix();
 }
-
-
-
 
 
 /*
@@ -138,7 +135,7 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
-   drawSpaceship();
+   mainSpaceship.drawSpaceship();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -267,7 +264,7 @@ void key(unsigned char ch,int x,int y)
       mode = 1-mode;
    //  Toggle light movement
    else if (ch == 'm' || ch == 'M')
-      move = 1-move;
+      move2 = 1-move2;
    //  Move light
    else if (ch == '<')
       zh += 1;
@@ -313,7 +310,7 @@ void key(unsigned char ch,int x,int y)
    //  Reproject
    Project(mode?fov:0,asp,dim);
    //  Animate if requested
-   glutIdleFunc(move?idle:NULL);
+   glutIdleFunc(move2?idle:NULL);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }

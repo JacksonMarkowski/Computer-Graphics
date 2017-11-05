@@ -1,4 +1,3 @@
-# Example 13
 EXE=project
 
 # Main target
@@ -24,8 +23,8 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-Lighting_Scene.o: Lighting_Scene.c Spaceship.c CSCIx229.h
-Spaceship.o: Spaceship.c CSCIx229.h
+CG_Project.o: CG_Project.cpp Spaceship.cpp CSCIx229.h
+Spaceship.o: Spaceship.cpp CSCIx229.h
 fatal.o: fatal.c CSCIx229.h
 loadtexbmp.o: loadtexbmp.c CSCIx229.h
 print.o: print.c CSCIx229.h
@@ -44,8 +43,8 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	g++ -c $(CFLG) $<
 
 #  Link
-project:Lighting_Scene.o CSCIx229.a
-	gcc -O3 -o $@ $^   $(LIBS)
+project:CG_Project.o CSCIx229.a
+	g++ -O3 -o $@ $^   $(LIBS)
 
 #  Clean
 clean:
