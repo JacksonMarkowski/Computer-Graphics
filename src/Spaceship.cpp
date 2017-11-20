@@ -1,15 +1,7 @@
 #include "CSCIx229.h"
 
-using namespace std;
-
-struct Vec3d {
-	double x;
-	double y;
-	double z;
-	Vec3d(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
-	Vec3d() {}
-	void setValues(double _x, double _y, double _z) { x = _x; y = _y; z = _z; }
-};
+//using namespace std;
+#include "Vec3d.h"
 
 struct Trans3d {
 	Vec3d pos;
@@ -22,7 +14,7 @@ struct Trans3d {
 
 class Spaceship {
 	private:
-		int metal1Tex, metal2Tex, domeRingTex, domeTex;
+		int metal1Tex, testTex, domeRingTex, domeTex;
 		void applyTrans3d(Trans3d transform);
 		void drawWingPanel(Trans3d transform, int texture);
 		void drawWingPanelSideEdge(Trans3d transform, int texture, double normal);
@@ -76,7 +68,7 @@ void Spaceship::draw() {
 
 void Spaceship::loadTex() {
 	metal1Tex = LoadTexBMP("../textures/MetalSec.bmp");
-	metal2Tex = LoadTexBMP("../textures/Metal2.bmp");
+	testTex = LoadTexBMP("../textures/Checker.bmp");
 	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
 	domeTex = LoadTexBMP("../textures/MetalSecDome.bmp");
 }
