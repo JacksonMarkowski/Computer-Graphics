@@ -1,5 +1,6 @@
 #include "CSCIx229.h"
 #include "Spaceship.cpp"
+#include "Land.cpp"
 
 int printInfo=0;
 int axes=1;       //  Display axes
@@ -13,7 +14,7 @@ double asp=1;     //  Aspect ratio
 double dim=3.0;   //  Size of world
 // Light values
 int one       =   1;  // Unit value
-int distance  =   5;  // Light distance
+int distance  =   15;  // Light distance
 int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
 int local     =   0;  // Local Viewer Model
@@ -29,6 +30,7 @@ float ylight  =   0;  // Elevation of light
 int metalTex;
 
 Spaceship mainSpaceship;
+Land land;
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -141,6 +143,8 @@ void display() {
 
    //Draws vaious spaceships
    mainSpaceship.draw();
+   land.draw();
+
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -350,7 +354,8 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
-   mainSpaceship.loadTex();
+   mainSpaceship.loadComponents();
+   land.loadComponents();
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();

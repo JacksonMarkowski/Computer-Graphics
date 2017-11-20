@@ -1,12 +1,12 @@
 #include "CSCIx229.h"
 
 //using namespace std;
-#include "Vec3d.h"
+#include "Ver3d.h"
 
 struct Trans3d {
-	Vec3d pos;
-	Vec3d rot;
-	Vec3d scale;
+	Ver3d pos;
+	Ver3d rot;
+	Ver3d scale;
 	Trans3d(double xPos, double yPos, double zPos, double xScale, double yScale, double zScale, double xRot, double yRot, double zRot) {
 		pos.setValues(xPos, yPos, zPos); scale.setValues(xScale, yScale, zScale); rot.setValues(xRot, yRot, zRot);
 	}
@@ -32,7 +32,7 @@ class Spaceship {
 	public:
 		Spaceship();
 		void draw();
-		void loadTex();
+		void loadComponents();
 };
 
 Spaceship::Spaceship() {
@@ -66,7 +66,7 @@ void Spaceship::draw() {
 
 }
 
-void Spaceship::loadTex() {
+void Spaceship::loadComponents() {
 	metal1Tex = LoadTexBMP("../textures/MetalSec.bmp");
 	testTex = LoadTexBMP("../textures/Checker.bmp");
 	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
