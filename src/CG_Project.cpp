@@ -1,17 +1,14 @@
 #include "CSCIx229.h"
 #include "Spaceship.cpp"
 #include "Land.cpp"
+#include "Camera.cpp"
 
 int printInfo=0;
 int axes=1;       //  Display axes
-int mode=1;       //  Projection mode
 int move2=1;       //  Move light
-int th=40;         //  Azimuth of view angle
-int ph=25;         //  Elevation of view angle
-int fov=55;       //  Field of view (for perspective)
+
 int light=1;      //  Lighting
-double asp=1;     //  Aspect ratio
-double dim=3.0;   //  Size of world
+
 // Light values
 int one       =   1;  // Unit value
 int distance  =   15;  // Light distance
@@ -31,6 +28,7 @@ int metalTex;
 
 Spaceship mainSpaceship;
 Land land;
+Camera camera;
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -92,19 +90,7 @@ void display() {
    //  Undo previous transformations
    glLoadIdentity();
    //  Perspective - set eye position
-   if (mode)
-   {
-      double Ex = -2*dim*Sin(th)*Cos(ph);
-      double Ey = +2*dim        *Sin(ph);
-      double Ez = +2*dim*Cos(th)*Cos(ph);
-      gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
-   }
-   //  Orthogonal - set world orientation
-   else
-   {
-      glRotatef(ph,1,0,0);
-      glRotatef(th,0,1,0);
-   }
+   camera.updateView();
 
    //  Flat or smooth shading
    glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
@@ -168,6 +154,7 @@ void display() {
       Print("Z");
    }
 
+   /*
    if (printInfo) {
    //  Display parameters
       glWindowPos2i(5,5);
@@ -180,7 +167,7 @@ void display() {
          glWindowPos2i(5,25);
          Print("Ambient=%d  Diffuse=%d Specular=%d Emission=%d Shininess=%.0f",ambient,diffuse,specular,emission,shiny);
       }
-   }
+   }*/
 
    //  Render the scene and make it visible
    ErrCheck("display");
@@ -207,22 +194,22 @@ void special(int key,int x,int y)
 {
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT)
-      th += 5;
+      camera.incTH(5);
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT)
-      th -= 5;
+      camera.incTH(-5);
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
-      ph += 5;
+      camera.incPH(5);
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
-      ph -= 5;
+      camera.incPH(-5);
    //  PageUp key - increase dim
    else if (key == GLUT_KEY_PAGE_DOWN)
-      dim += 0.1;
+      camera.incDIM(0.1);
    //  PageDown key - decrease dim
-   else if (key == GLUT_KEY_PAGE_UP && dim>1)
-      dim -= 0.1;
+   else if (key == GLUT_KEY_PAGE_UP)
+      camera.incDIM(-0.1);
    //  Smooth color model
    else if (key == GLUT_KEY_F1)
       smooth = 1-smooth;
@@ -237,11 +224,9 @@ void special(int key,int x,int y)
    //  Flip sign
    else if (key == GLUT_KEY_F9)
       one = -one;
-   //  Keep angles to +/-360 degrees
-   th %= 360;
-   ph %= 360;
+
    //  Update projection
-   Project(mode?fov:0,asp,dim);
+   camera.updateProjection();
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -256,8 +241,7 @@ void key(unsigned char ch,int x,int y)
       exit(0);
    //  Reset view angle
    else if (ch == '0') {
-      th = 40;
-      ph = 25;
+      camera.rotate(40, 25);
    }
    //  Toggle axes
    else if (ch == 'x' || ch == 'X')
@@ -269,8 +253,8 @@ void key(unsigned char ch,int x,int y)
    else if (ch == 'l' || ch == 'L')
       light = 1-light;
    //  Switch projection mode
-   else if (ch == 'p' || ch == 'P')
-      mode = 1-mode;
+   //else if (ch == 'p' || ch == 'P')
+      //mode = 1-mode;
    //  Toggle light movement
    else if (ch == 'm' || ch == 'M')
       move2 = 1-move2;
@@ -280,10 +264,11 @@ void key(unsigned char ch,int x,int y)
    else if (ch == '>')
       zh -= 1;
    //  Change field of view angle
-   else if (ch == '-' && ch>1)
-      fov--;
-   else if (ch == '+' && ch<179)
-      fov++;
+   //else if (ch == '-' && ch>1)
+      //ToDo: set fov in camera
+      //fov--;
+   //else if (ch == '+' && ch<179)
+      //fov++;
    //  Light elevation
    else if (ch=='[')
       ylight -= 0.1;
@@ -317,7 +302,7 @@ void key(unsigned char ch,int x,int y)
    //  Translate shininess power to value (-1 => 0)
    shiny = shininess<0 ? 0 : pow(2.0,shininess);
    //  Reproject
-   Project(mode?fov:0,asp,dim);
+   camera.updateProjection();
    //  Animate if requested
    glutIdleFunc(move2?idle:NULL);
    //  Tell GLUT it is necessary to redisplay the scene
@@ -330,11 +315,13 @@ void key(unsigned char ch,int x,int y)
 void reshape(int width,int height)
 {
    //  Ratio of the width to the height of the window
-   asp = (height>0) ? (double)width/height : 1;
-   //  Set the viewport to the entire window
+   //asp = (height>0) ? (double)width/height : 1;
+   camera.setASP((height>0) ? (double)width/height : 1);
+      //  Set the viewport to the entire window
    glViewport(0,0, width,height);
    //  Set projection
-   Project(mode?fov:0,asp,dim);
+   camera.updateProjection();
+   //Project(mode?fov:0,asp,dim);
 }
 
 /*
@@ -354,8 +341,18 @@ int main(int argc,char* argv[])
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
+
    mainSpaceship.loadComponents();
    land.loadComponents();
+
+   glClearColor( .73, .913, .968, 1);
+   glEnable(GL_FOG);
+   glFogf(GL_FOG_MODE, GL_LINEAR);
+   GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
+   glFogfv(GL_FOG_COLOR, fogColor);
+   glFogf(GL_FOG_START, 10.0f);
+   glFogf(GL_FOG_END, 15.0f);
+
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
