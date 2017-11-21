@@ -24,7 +24,7 @@ endif
 
 # Dependencies
 CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Camera.cpp
-Spaceship.o: Spaceship.cpp CSCIx229.h Ver3d.h
+Spaceship.o: Spaceship.cpp CSCIx229.h Ver3d.h Trans3d.h
 Land.o: Land.cpp CSCIx229.h
 Camera.o: Camera.cpp CSCIx229.h
 fatal.o: fatal.c CSCIx229.h
@@ -42,7 +42,7 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 .c.o:
 	gcc -c $(CFLG) $<
 .cpp.o:
-	g++ -c $(CFLG) $<
+	g++ -c $(CFLG) -std=c++11 $<
 
 #  Link
 project:CG_Project.o CSCIx229.a

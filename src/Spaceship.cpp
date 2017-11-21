@@ -3,18 +3,12 @@
 //using namespace std;
 #include "Ver3d.h"
 
-struct Trans3d {
-	Ver3d pos;
-	Ver3d rot;
-	Ver3d scale;
-	Trans3d(double xPos, double yPos, double zPos, double xScale, double yScale, double zScale, double xRot, double yRot, double zRot) {
-		pos.setValues(xPos, yPos, zPos); scale.setValues(xScale, yScale, zScale); rot.setValues(xRot, yRot, zRot);
-	}
-};
+#include "Trans3d.h"
 
 class Spaceship {
 	private:
 		int metal1Tex, testTex, domeRingTex, domeTex;
+		Trans3d transformation;
 		void applyTrans3d(Trans3d transform);
 		void drawWingPanel(Trans3d transform, int texture);
 		void drawWingPanelSideEdge(Trans3d transform, int texture, double normal);
@@ -31,6 +25,7 @@ class Spaceship {
 		void quadStripRotationTex(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY, double r1Tex, double r2Tex);
 	public:
 		Spaceship();
+		void setTransformation(Trans3d transformation);
 		void draw();
 		void loadComponents();
 };
@@ -39,8 +34,14 @@ Spaceship::Spaceship() {
 	//metalTex = LoadTexBMP("Metal.bmp");
 }
 
+void Spaceship::setTransformation(Trans3d transformation) {
+	this->transformation = transformation;
+}
+
 void Spaceship::draw() {
 	int i;
+	glPushMatrix();
+	applyTrans3d(transformation);
 	
 	for(i = 0; i < 360; i+=45) {
 		drawWingPanel(Trans3d (0,0,0,1,1,1,0,i,0), metal1Tex);
@@ -52,7 +53,7 @@ void Spaceship::draw() {
 	}
 	drawWingBase(Trans3d (0,-.1,0,1,1,1,0,0,0), metal1Tex, 1.0);
 
-	glColor4f(.768, .16, .05, .3);
+	glColor4f(.768, .16, .05, .8);
 	quadStripRotation(0,360,4.0,0,.081,.998,.989,.97);
 	drawDomeRing(Trans3d (0,.37,0,1,1,1,0,0,0), domeRingTex);
 	
@@ -63,6 +64,8 @@ void Spaceship::draw() {
 
 	drawBottomOpening(Trans3d (0,-.51,0,.41,.5,.41,180,0,0), metal1Tex);
 	drawBottomOpeningRing(Trans3d (0,-.51,0,.82,1,.82,180,0,0), metal1Tex);
+
+	glPopMatrix();
 
 }
 
@@ -116,7 +119,7 @@ void Spaceship::drawWingPanelSideEdge(Trans3d transform, int texture, double nor
 
 	//glEnable(GL_TEXTURE_2D);
 	//glBindTexture(GL_TEXTURE_2D,texture);
-	glColor4f(.768, .16, .05, .3);
+	glColor4f(.768, .16, .05, .8);
 
 	double j;
 	double d2 = .05;
@@ -295,7 +298,7 @@ void Spaceship::drawCenterRing(Trans3d transform, int texture) {
 
 	glDisable(GL_TEXTURE_2D);
 
-	glColor4f(.768, .16, .05, .3);
+	glColor4f(.768, .16, .05, .6);
 	for (double i = 13.25; i < 360; i+=22.5) {
 		for (double j = 0; j <= 8; j += 4) {
 
@@ -349,7 +352,7 @@ void Spaceship::drawBottomOpening(Trans3d transform, int texture) {
 			quadStripRotationTex(0+z,32+z,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);
 			glDisable(GL_TEXTURE_2D);
 
-			glColor4f(.768, .16, .05, .3);
+			glColor4f(.768, .16, .05, .8);
 			quadStripRotation(32+z,72+z,4.0,r1,r2,y1,y2,normalY);		
 		}
 	}

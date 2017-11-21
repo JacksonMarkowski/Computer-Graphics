@@ -2,9 +2,10 @@
 #include "Spaceship.cpp"
 #include "Land.cpp"
 #include "Camera.cpp"
+#include "Trans3d.h"
 
 int printInfo=0;
-int axes=1;       //  Display axes
+int axes=0;       //  Display axes
 int move2=1;       //  Move light
 
 int light=1;      //  Lighting
@@ -16,7 +17,7 @@ int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
 int local     =   0;  // Local Viewer Model
 int emission  =   0;  // Emission intensity (%)
-int ambient   =  25;  // Ambient intensity (%)
+int ambient   =  40;  // Ambient intensity (%)
 int diffuse   =  70;  // Diffuse intensity (%)
 int specular  =   5;  // Specular intensity (%)
 int shininess =   1;  // Shininess (power of two)
@@ -47,7 +48,7 @@ static void Vertex(double th,double ph)
 static void ball(double x,double y,double z,double r) {
    int th,ph;
    float yellow[] = {1.0,1.0,0.0,1.0};
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+   float Emission[]  = {0.0,0.0,(float)0.01*emission,1.0};
    //  Save transformation
    glPushMatrix();
    //  Offset, scale and rotate
@@ -99,11 +100,11 @@ void display() {
    if (light)
    {
         //  Translate intensity to color vectors
-        float Ambient[]   = {0.01*ambient ,0.01*ambient ,0.01*ambient ,1.0};
-        float Diffuse[]   = {0.01*diffuse ,0.01*diffuse ,0.01*diffuse ,1.0};
-        float Specular[]  = {0.01*specular,0.01*specular,0.01*specular,1.0};
+        float Ambient[]   = {(float)0.01*ambient ,(float)0.01*ambient ,(float)0.01*ambient ,1.0};
+        float Diffuse[]   = {(float)0.01*diffuse ,(float)0.01*diffuse ,(float)0.01*diffuse ,1.0};
+        float Specular[]  = {(float)0.01*specular,(float)0.01*specular,(float)0.01*specular,1.0};
         //  Light position
-        float Position[]  = {distance*Cos(zh),ylight,distance*Sin(zh),1.0};
+        float Position[]  = {(float)(distance*Cos(zh)),ylight,(float)(distance*Sin(zh)),1.0};
         //  Draw light position as ball (still no lighting here)
         glColor3f(1,1,1);
         ball(Position[0],Position[1],Position[2] , 0.1);
@@ -128,6 +129,7 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
+   mainSpaceship.setTransformation(Trans3d (0,1.5,0,.5,.5,.5,0,0,0));
    mainSpaceship.draw();
    land.draw();
 
@@ -225,7 +227,6 @@ void special(int key,int x,int y)
    else if (key == GLUT_KEY_F9)
       one = -one;
 
-   //  Update projection
    camera.updateProjection();
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
@@ -346,7 +347,7 @@ int main(int argc,char* argv[])
    land.loadComponents();
 
    glClearColor( .73, .913, .968, 1);
-   glEnable(GL_FOG);
+   //glEnable(GL_FOG);
    glFogf(GL_FOG_MODE, GL_LINEAR);
    GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
    glFogfv(GL_FOG_COLOR, fogColor);
