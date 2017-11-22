@@ -1,8 +1,11 @@
 #include "CSCIx229.h"
+#include "Trans3d.h"
+
 #include "Spaceship.cpp"
 #include "Land.cpp"
+#include "Barn.cpp"
+#include "Fence.cpp"
 #include "Camera.cpp"
-#include "Trans3d.h"
 
 int printInfo=0;
 int axes=0;       //  Display axes
@@ -32,6 +35,8 @@ double previousTime = 0;
 
 Spaceship mainSpaceship;
 Land land;
+Barn barn;
+Fence fence;
 Camera camera;
 
 /*
@@ -133,11 +138,18 @@ void display() {
 
    //Draws vaious spaceships
    double elapsedTime = currentTime - previousTime;
-   mainSpaceship.setTransformation(Trans3d (0,1.5,0,.5,.5,.5,0,zh,0));
+   mainSpaceship.setTransformation(Trans3d(0,1.5,0,.5,.5,.5,0,zh,0));
    mainSpaceship.update(elapsedTime);
    mainSpaceship.draw();
+   land.setTransformation(Trans3d(0,0,0,1,1,1,0,0,0));
    land.draw();
 
+
+   barn.setTransformation(Trans3d(-2.3,.95,-5,.17,.17,.17,0,10,0));
+   barn.draw();
+
+   fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
+   fence.draw();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -352,6 +364,8 @@ int main(int argc,char* argv[])
 
    mainSpaceship.loadComponents();
    land.loadComponents();
+   barn.loadComponents();
+   fence.loadComponents();
 
    glClearColor( .73, .913, .968, 1);
    //glEnable(GL_FOG);

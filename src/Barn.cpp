@@ -4,58 +4,56 @@
 
 //using namespace std;
 
-class Land {
+class Barn {
 	private:
-		int landObj;
-		int landTex;
+		int barnObj;
+		int barnTex;
 		Trans3d transformation;
 		void applyTrans3d(Trans3d transform);
 	public:
-		Land();
+		Barn();
 		void draw();
 		void loadComponents();
 		void setTransformation(Trans3d transformation);
 };
 
-Land::Land() {
+Barn::Barn() {
 	//loadComponents();
 }
 
-void Land::draw() {
+void Barn::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);
 
 	glColor3f(1, 1, 1);
-
 	float ambient[] = {0.7,0.7,0.7,0.7};
 	float diffuse[] = {0.7,0.7,0.7,1.0};
 	float specular[] = {0.7,0.7,0.7,0.0};
 	//float emission[] = {1.0,1.0,1.0,1.0};
-	float shine = 20.0;
+	float shine = 0.0;
 	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT, ambient);
 	glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE, diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR, specular);
 	glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS, shine);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D,landTex);
-	glCallList(landObj);
+	glBindTexture(GL_TEXTURE_2D,barnTex);
+	glCallList(barnObj);
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
-
 }
 
-void Land::loadComponents() {
-	landObj = LoadOBJ("../objects/land.obj");
-	landTex = LoadTexBMP("../textures/LandColor.bmp");
+void Barn::loadComponents() {
+	barnObj = LoadOBJ("../objects/barn.obj");
+	barnTex = LoadTexBMP("../textures/BarnColor.bmp");
 }
 
-void Land::setTransformation(Trans3d transformation) {
+void Barn::setTransformation(Trans3d transformation) {
 	this->transformation = transformation;
 }
 
-void Land::applyTrans3d(Trans3d transform) {
+void Barn::applyTrans3d(Trans3d transform) {
 	glTranslated(transform.pos.x,transform.pos.y,transform.pos.z);
 	glRotated(transform.rot.x,1,0,0);
 	glRotated(transform.rot.y,0,1,0);

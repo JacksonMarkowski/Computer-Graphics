@@ -23,10 +23,12 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Camera.cpp
+CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Barn.cpp Fence.cpp Camera.cpp
 Spaceship.o: Spaceship.cpp CSCIx229.h Ver3d.h Trans3d.h
-Land.o: Land.cpp CSCIx229.h
+Land.o: Land.cpp CSCIx229.h Trans3d.h
 Camera.o: Camera.cpp CSCIx229.h
+Barn.o: Barn.cpp CSCIx220.h Trans3d.h
+Fence.o: Fence.cpp CSCIx220.h Trans3d.h
 fatal.o: fatal.c CSCIx229.h
 loadtexbmp.o: loadtexbmp.c CSCIx229.h
 print.o: print.c CSCIx229.h

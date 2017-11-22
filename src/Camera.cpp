@@ -9,8 +9,8 @@ class Camera {
 		double camY = 3;
 		double camZ = 4;
 
-		int th = 25;
-		int ph = 35;
+		int th = -65;
+		int ph = 25;
 
 		double fov = 55; 
 		double asp = 1.0;
