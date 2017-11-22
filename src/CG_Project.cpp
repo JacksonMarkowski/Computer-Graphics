@@ -17,15 +17,18 @@ int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
 int local     =   0;  // Local Viewer Model
 int emission  =   0;  // Emission intensity (%)
-int ambient   =  40;  // Ambient intensity (%)
+int ambient   =  50;  // Ambient intensity (%)
 int diffuse   =  70;  // Diffuse intensity (%)
-int specular  =   5;  // Specular intensity (%)
-int shininess =   1;  // Shininess (power of two)
+int specular  =   65;  // Specular intensity (%)
+int shininess =   4;  // Shininess (power of two)
 float shiny   =   1;  // Shininess (value)
 int zh        =  90;  // Light azimuth
-float ylight  =   0;  // Elevation of light
+float ylight  =   1.4;  // Elevation of light
 
 int metalTex;
+
+double currentTime = 0;
+double previousTime = 0;
 
 Spaceship mainSpaceship;
 Land land;
@@ -104,7 +107,7 @@ void display() {
         float Diffuse[]   = {(float)0.01*diffuse ,(float)0.01*diffuse ,(float)0.01*diffuse ,1.0};
         float Specular[]  = {(float)0.01*specular,(float)0.01*specular,(float)0.01*specular,1.0};
         //  Light position
-        float Position[]  = {(float)(distance*Cos(zh)),ylight,(float)(distance*Sin(zh)),1.0};
+        float Position[]  = {(float)(distance*Cos(0)),ylight,(float)(distance*Sin(0)),1.0};
         //  Draw light position as ball (still no lighting here)
         glColor3f(1,1,1);
         ball(Position[0],Position[1],Position[2] , 0.1);
@@ -129,7 +132,9 @@ void display() {
      glDisable(GL_LIGHTING);
 
    //Draws vaious spaceships
-   mainSpaceship.setTransformation(Trans3d (0,1.5,0,.5,.5,.5,0,0,0));
+   double elapsedTime = currentTime - previousTime;
+   mainSpaceship.setTransformation(Trans3d (0,1.5,0,.5,.5,.5,0,zh,0));
+   mainSpaceship.update(elapsedTime);
    mainSpaceship.draw();
    land.draw();
 
@@ -156,12 +161,12 @@ void display() {
       Print("Z");
    }
 
-   /*
+   
    if (printInfo) {
    //  Display parameters
       glWindowPos2i(5,5);
-      Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s Light=%s",
-        th,ph,dim,fov,mode?"Perpective":"Orthogonal",light?"On":"Off");
+      //Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s Light=%s",
+        //th,ph,dim,fov,mode?"Perpective":"Orthogonal",light?"On":"Off");
       if (light)
       {
          glWindowPos2i(5,45);
@@ -169,7 +174,7 @@ void display() {
          glWindowPos2i(5,25);
          Print("Ambient=%d  Diffuse=%d Specular=%d Emission=%d Shininess=%.0f",ambient,diffuse,specular,emission,shiny);
       }
-   }*/
+   }
 
    //  Render the scene and make it visible
    ErrCheck("display");
@@ -183,8 +188,10 @@ void display() {
 void idle()
 {
    //  Elapsed time in seconds
-   double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
-   zh = fmod(90*t,360.0);
+   previousTime = currentTime;
+   currentTime = glutGet(GLUT_ELAPSED_TIME);
+   //printf("%f\n", time);
+   zh = fmod(90*currentTime/1000.0,360.0);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -305,7 +312,7 @@ void key(unsigned char ch,int x,int y)
    //  Reproject
    camera.updateProjection();
    //  Animate if requested
-   glutIdleFunc(move2?idle:NULL);
+   //glutIdleFunc(move2?idle:NULL);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
