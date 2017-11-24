@@ -5,6 +5,9 @@
 #include "Land.cpp"
 #include "Barn.cpp"
 #include "Fence.cpp"
+#include "Grass.cpp"
+#include "Tree.cpp"
+#include "Cow.cpp"
 #include "Camera.cpp"
 
 int printInfo=0;
@@ -141,6 +144,7 @@ void display() {
    mainSpaceship.setTransformation(Trans3d(0,1.5,0,.5,.5,.5,0,zh,0));
    mainSpaceship.update(elapsedTime);
    mainSpaceship.draw();
+
    land.setTransformation(Trans3d(0,0,0,1,1,1,0,0,0));
    land.draw();
 
