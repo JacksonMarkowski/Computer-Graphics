@@ -9,6 +9,7 @@ void Entity::draw() {
 	applyTrans3d(transformation);
 
 	glColor3f(1, 1, 1);
+
 	glCallList(obj);
 
 	glPopMatrix();
@@ -17,6 +18,11 @@ void Entity::draw() {
 void Entity::loadComponents() {
 	//default obj
 	//obj = LoadOBJ("../objects/Null.obj");
+}
+
+
+void Entity::update(double elapsedTime) {
+	//Update entity
 }
 
 void Entity::setTrans3d(Trans3d transformation) {

@@ -1,45 +1,4 @@
-#include "CSCIx229.h"
-
-//using namespace std;
-#include "Ver3d.h"
-
-#include "Trans3d.h"
-
-struct light {
-	double value;
-	int brightening;
-};
-
-class Spaceship {
-	private:
-		int metalSecTex, domeRingTex, domeTex;
-		Trans3d transformation;
-		struct light lights[8];
-		void applyTrans3d(Trans3d transform);
-
-		void drawWingPanel(Trans3d transform, int texture);
-		void drawWingPanelSideEdge(Trans3d transform, int texture, double normal, double emission);
-		void drawWingPanelInsideEdge(Trans3d transform, int texture);
-		void drawWingPanelOutsideEdge(Trans3d transform, int texture);
-		void drawWingBase(Trans3d transform, int texture, double upToj);
-		void drawDomePanel(Trans3d transform, int texture);
-		void drawDomeRing(Trans3d transform, int texture);
-		void drawCenterRing(Trans3d transform, int texture);
-		void drawBottomOpening(Trans3d transform, int texture);
-		void drawBottomOpeningRing(Trans3d transform, int texture);
-
-		void quadStripRotation(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY);
-		void quadStripRotationTex(double startDegree, double endDegree, double incDegree, double r1, double r2, double y1, double y2, double normalY, double r1Tex, double r2Tex);
-		
-		void applyMetalMaterial();
-		void applyLightMaterial();
-	public:
-		Spaceship();
-		void setTrans3d(Trans3d transformation);
-		void update(double time);
-		void draw();
-		void loadComponents();
-};
+#include "Spaceship.h"
 
 Spaceship::Spaceship() {
 	//metalTex = LoadTexBMP("Metal.bmp");
@@ -52,10 +11,6 @@ Spaceship::Spaceship() {
 	lights[6].value = .5; lights[6].brightening = 0;
 	lights[7].value = .75; lights[7].brightening = 0;
 
-}
-
-void Spaceship::setTrans3d(Trans3d transformation) {
-	this->transformation = transformation;
 }
 
 void Spaceship::update(double elapsedTime) {
@@ -121,14 +76,6 @@ void Spaceship::loadComponents() {
 	metalSecTex = LoadTexBMP("../textures/MetalSec.bmp");
 	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
 	domeTex = LoadTexBMP("../textures/MetalSecDome.bmp");
-}
-
-void Spaceship::applyTrans3d(Trans3d transform) {
-	glTranslated(transform.pos.x,transform.pos.y,transform.pos.z);
-	glRotated(transform.rot.x,1,0,0);
-	glRotated(transform.rot.y,0,1,0);
-	glRotated(transform.rot.z,0,0,1);
-	glScaled(transform.scale.x,transform.scale.y,transform.scale.z);
 }
 
 void Spaceship::drawWingPanel(Trans3d transform, int texture) {
