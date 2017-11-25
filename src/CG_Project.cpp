@@ -39,11 +39,12 @@ double currentTime = 0;
 double previousTime = 0;
 
 Spaceship mainSpaceship;
+Spaceship crash;
 Land land;
 Barn barn;
 Grass g;
-Fence fence;
-Fence fence2;
+Fence fence[15];
+//Fence fence2;
 Camera camera;
 
 /*
@@ -152,14 +153,46 @@ void display() {
    land.setTransformation(Trans3d(0,0,0,1,1,1,0,0,0));
    land.draw();
 
+    crash.setTransformation(Trans3d(.3,.56,-1.7,.45,.45,.45,-40,0,155));
+    crash.draw();
+
 
    barn.setTransformation(Trans3d(-2.3,.95,-5,.17,.17,.17,0,10,0));
    barn.draw();
 
-   fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
-   fence.draw();
-   fence2.setTransformation(Trans3d(-1.5,1.3,-5,.08,.08,.08,0,0,0));
-   fence2.draw();
+   fence[0].setTransformation(Trans3d(-1.76,.95,-6,.08,.08,.08,0,0,-5.0));
+   fence[0].draw();
+   fence[1].setTransformation(Trans3d(-.671,.863,-6,.08,.08,.08,0,0,-11.9));
+   fence[1].draw();
+   fence[2].setTransformation(Trans3d(.462,.62,-6,.08,.08,.08,0,0,-14.2));
+   fence[2].draw();
+   fence[3].setTransformation(Trans3d(1.55,.34,-6,.08,.08,.08,0,0,-13));
+   fence[3].draw();
+   fence[4].setTransformation(Trans3d(2.689,.07,-6,.08,.08,.08,0,-45,-5));
+   fence[4].draw();
+   fence[5].setTransformation(Trans3d(3.50,-.055,-5.15,.08,.08,.08,0,-90,0));
+   fence[5].draw();
+   fence[6].setTransformation(Trans3d(3.50,-.055,-4.02,.08,.08,.08,0,-95,1.25));
+   fence[6].draw();
+   fence[7].setTransformation(Trans3d(3.36,-.055,-2.845,.08,.08,.08,0,-135,0));
+   fence[7].draw();
+   fence[8].setTransformation(Trans3d(2.51,-.045,-2.06,.08,.08,.08,0,-175,10));
+   fence[8].draw();
+   fence[9].setTransformation(Trans3d(1.47,.19,-1.95,.08,.08,.08,-7,-203,-9));
+   fence[9].draw();
+
+   fence[10].setTransformation(Trans3d(-2.78,1,-3.94,.08,.08,.08,0,-90,-6));
+   fence[10].draw();
+   fence[11].setTransformation(Trans3d(-2.78,.88,-2.86,.08,.08,.08,0,-80,-15.5));
+   fence[11].draw();
+   fence[12].setTransformation(Trans3d(-2.55,.57,-1.740,.08,.08,.08,8,0,1.9));
+   fence[12].draw();
+   fence[13].setTransformation(Trans3d(-1.461,.57,-1.733,.08,.08,.08,4,0,-3));
+   fence[13].draw();
+   fence[14].setTransformation(Trans3d(-.395,.52,-1.733,.08,.08,.08,0,5,-20));
+   fence[14].draw();
+
+
    g.setTransformation(Trans3d(-2,.5,0,.3,.3,.3,0,0,0));
    g.draw();
 
@@ -375,10 +408,25 @@ int main(int argc,char* argv[])
    glutIdleFunc(idle);
 
    mainSpaceship.loadComponents();
+   crash.loadComponents();
    land.loadComponents();
    barn.loadComponents();
-   fence.loadComponents();
-   fence2.loadComponents();
+   fence[0].loadComponents();
+   fence[1].loadComponents();
+   fence[2].loadComponents();
+   fence[3].loadComponents();
+   fence[4].loadComponents();
+   fence[5].loadComponents();
+   fence[6].loadComponents();
+   fence[7].loadComponents();
+   fence[8].loadComponents();
+   fence[9].loadComponents();
+   fence[10].loadComponents();
+   fence[11].loadComponents();
+   fence[12].loadComponents();
+   fence[13].loadComponents();
+   fence[14].loadComponents();
+
    g.loadComponents();
 
    glClearColor( .73, .913, .968, 1);

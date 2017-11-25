@@ -7,7 +7,6 @@
 class Land {
 	private:
 		int landObj;
-		int landTex;
 		Trans3d transformation;
 		void applyTrans3d(Trans3d transform);
 	public:
@@ -26,7 +25,6 @@ void Land::draw() {
 	applyTrans3d(transformation);
 
 	glColor3f(1, 1, 1);
-
 
 	glCallList(landObj);
 
