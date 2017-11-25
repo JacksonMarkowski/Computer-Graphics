@@ -15,7 +15,7 @@ class Entity {
 		Entity();
 		virtual void draw();
 		virtual void loadComponents();
-		void setTransformation(Trans3d transformation);
+		void setTrans3d(Trans3d transformation);
 };
 
 #endif

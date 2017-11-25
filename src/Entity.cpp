@@ -19,7 +19,7 @@ void Entity::loadComponents() {
 	//obj = LoadOBJ("../objects/Null.obj");
 }
 
-void Entity::setTransformation(Trans3d transformation) {
+void Entity::setTrans3d(Trans3d transformation) {
 	this->transformation = transformation;
 }
 

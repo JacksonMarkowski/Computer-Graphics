@@ -35,7 +35,7 @@ class Spaceship {
 		void applyLightMaterial();
 	public:
 		Spaceship();
-		void setTransformation(Trans3d transformation);
+		void setTrans3d(Trans3d transformation);
 		void update(double time);
 		void draw();
 		void loadComponents();
@@ -54,7 +54,7 @@ Spaceship::Spaceship() {
 
 }
 
-void Spaceship::setTransformation(Trans3d transformation) {
+void Spaceship::setTrans3d(Trans3d transformation) {
 	this->transformation = transformation;
 }
 

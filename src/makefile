@@ -23,8 +23,9 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Entity.cpp Barn.cpp Fence.cpp Cow.cpp Tree.cpp Grass.cpp Camera.cpp
+CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Terrain.cpp Entity.cpp Barn.cpp Fence.cpp Cow.cpp Tree.cpp Grass.cpp Camera.cpp
 Entity.o: entity.cpp entity.h
+Terrain.o: Terrain.cpp Terrain.h
 Barn.o: Barn.cpp Barn.h
 Fence.o: Fence.cpp Fence.h
 Cow.o: Cow.cpp Cow.h
@@ -48,7 +49,7 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	g++ -c $(CFLG) -std=c++11 $<
 
 #  Link
-project:CG_Project.o CSCIx229.a Entity.o Barn.o Fence.o Cow.o Tree.o Grass.o
+project:CG_Project.o CSCIx229.a Entity.o Terrain.o Barn.o Fence.o Cow.o Tree.o Grass.o
 	g++ -O3 -o $@ $^   $(LIBS)
 
 #  Clean
