@@ -1,10 +1,10 @@
-#include "Cow.h"
+#include "Entity.h"
 
-Cow::Cow() {
+Entity::Entity() {
 	//loadComponents();
 }
 
-void Cow::draw() {
+void Entity::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);
 
@@ -27,7 +27,20 @@ void Cow::draw() {
 	glPopMatrix();
 }
 
-void Cow::loadComponents() {
-	obj = LoadOBJ("../objects/cow.obj");
-	tex = LoadTexBMP("../textures/CowColor.bmp");
+void Entity::loadComponents() {
+	//default load
+	//obj = LoadOBJ("../objects/Barn.obj");
+	//tex = LoadTexBMP("../textures/BarnColor.bmp");
+}
+
+void Entity::setTransformation(Trans3d transformation) {
+	this->transformation = transformation;
+}
+
+void Entity::applyTrans3d(Trans3d transform) {
+	glTranslated(transform.pos.x,transform.pos.y,transform.pos.z);
+	glRotated(transform.rot.x,1,0,0);
+	glRotated(transform.rot.y,0,1,0);
+	glRotated(transform.rot.z,0,0,1);
+	glScaled(transform.scale.x,transform.scale.y,transform.scale.z);
 }

@@ -1,21 +1,4 @@
-#include "CSCIx229.h"
-#include "Ver3d.h"
-#include "Trans3d.h"
-
-//using namespace std;
-
-class Barn {
-	private:
-		int barnObj;
-		int barnTex;
-		Trans3d transformation;
-		void applyTrans3d(Trans3d transform);
-	public:
-		Barn();
-		void draw();
-		void loadComponents();
-		void setTransformation(Trans3d transformation);
-};
+#include "Barn.h"
 
 Barn::Barn() {
 	//loadComponents();
@@ -37,26 +20,14 @@ void Barn::draw() {
 	glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS, shine);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D,barnTex);
-	glCallList(barnObj);
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glCallList(obj);
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
 void Barn::loadComponents() {
-	barnObj = LoadOBJ("../objects/barn.obj");
-	barnTex = LoadTexBMP("../textures/BarnColor.bmp");
-}
-
-void Barn::setTransformation(Trans3d transformation) {
-	this->transformation = transformation;
-}
-
-void Barn::applyTrans3d(Trans3d transform) {
-	glTranslated(transform.pos.x,transform.pos.y,transform.pos.z);
-	glRotated(transform.rot.x,1,0,0);
-	glRotated(transform.rot.y,0,1,0);
-	glRotated(transform.rot.z,0,0,1);
-	glScaled(transform.scale.x,transform.scale.y,transform.scale.z);
+	obj = LoadOBJ("../objects/barn.obj");
+	tex = LoadTexBMP("../textures/BarnColor.bmp");
 }

@@ -23,15 +23,13 @@ CLEAN=rm -f $(EXE) *.o *.a
 endif
 
 # Dependencies
-CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Barn.cpp Fence.cpp Grass.cpp Tree.cpp Cow.cpp Camera.cpp
-Spaceship.o: Spaceship.cpp CSCIx229.h Ver3d.h Trans3d.h
-Land.o: Land.cpp CSCIx229.h Trans3d.h
-Camera.o: Camera.cpp CSCIx229.h
-Barn.o: Barn.cpp CSCIx220.h Trans3d.h
-Fence.o: Fence.cpp CSCIx220.h Trans3d.h
-Grass.o: Grass.cpp CSCIx220.h Trans3d.h
-Tree.o: Tree.cpp CSCIx220.h Trans3d.h
-Cow.o: Cow.cpp CSCIx220.h Trans3d.h
+CG_Project.o: CG_Project.cpp CSCIx229.h Spaceship.cpp Land.cpp Entity.cpp Barn.cpp Fence.cpp Cow.cpp Tree.cpp Grass.cpp Camera.cpp
+Entity.o: entity.cpp entity.h
+Barn.o: Barn.cpp Barn.h
+Fence.o: Fence.cpp Fence.h
+Cow.o: Cow.cpp Cow.h
+Tree.o: Tree.cpp Tree.h
+Grass.o: Grass.cpp Grass.h
 fatal.o: fatal.c CSCIx229.h
 loadtexbmp.o: loadtexbmp.c CSCIx229.h
 print.o: print.c CSCIx229.h
@@ -43,6 +41,9 @@ object.o: object.c CSCIx229.h
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
+C.a:Entity.o
+	ar -rcs $@ $^
+
 # Compile rules
 .c.o:
 	gcc -c $(CFLG) $<
@@ -50,7 +51,7 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	g++ -c $(CFLG) -std=c++11 $<
 
 #  Link
-project:CG_Project.o CSCIx229.a
+project:CG_Project.o CSCIx229.a Entity.o Barn.o Fence.o Cow.o Tree.o Grass.o
 	g++ -O3 -o $@ $^   $(LIBS)
 
 #  Clean

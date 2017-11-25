@@ -1,21 +1,4 @@
-#include "CSCIx229.h"
-#include "Ver3d.h"
-#include "Trans3d.h"
-
-//using namespace std;
-
-class Tree {
-	private:
-		int treeObj;
-		int treeTex;
-		Trans3d transformation;
-		void applyTrans3d(Trans3d transform);
-	public:
-		Tree();
-		void draw();
-		void loadComponents();
-		void setTransformation(Trans3d transformation);
-};
+#include "Tree.h"
 
 Tree::Tree() {
 	//loadComponents();
@@ -37,26 +20,14 @@ void Tree::draw() {
 	glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS, shine);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D,treeTex);
-	glCallList(treeObj);
+	glBindTexture(GL_TEXTURE_2D,tex);
+	glCallList(obj);
 	glDisable(GL_TEXTURE_2D);
 
 	glPopMatrix();
 }
 
 void Tree::loadComponents() {
-	treeObj = LoadOBJ("../objects/tree.obj");
-	treeTex = LoadTexBMP("../textures/TreeColor.bmp");
-}
-
-void Tree::setTransformation(Trans3d transformation) {
-	this->transformation = transformation;
-}
-
-void Tree::applyTrans3d(Trans3d transform) {
-	glTranslated(transform.pos.x,transform.pos.y,transform.pos.z);
-	glRotated(transform.rot.x,1,0,0);
-	glRotated(transform.rot.y,0,1,0);
-	glRotated(transform.rot.z,0,0,1);
-	glScaled(transform.scale.x,transform.scale.y,transform.scale.z);
+	obj = LoadOBJ("../objects/tree.obj");
+	tex = LoadTexBMP("../textures/TreeColor.bmp");
 }

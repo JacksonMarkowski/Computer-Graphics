@@ -1,14 +1,16 @@
 #include "CSCIx229.h"
 #include "Trans3d.h"
 
+//#include "Entity.cpp"
 #include "Spaceship.cpp"
 #include "Land.cpp"
-#include "Barn.cpp"
-#include "Fence.cpp"
-#include "Grass.cpp"
-#include "Tree.cpp"
-#include "Cow.cpp"
+#include "Barn.h"
+#include "Fence.h"
+#include "Grass.h"
+#include "Tree.h"
+#include "Cow.h"
 #include "Camera.cpp"
+#include "Entity.h"
 
 int printInfo=0;
 int axes=0;       //  Display axes
@@ -39,7 +41,8 @@ double previousTime = 0;
 Spaceship mainSpaceship;
 Land land;
 Barn barn;
-Fence fence;
+//Entity barn;
+//Fence fence;
 Camera camera;
 
 /*
@@ -152,8 +155,8 @@ void display() {
    barn.setTransformation(Trans3d(-2.3,.95,-5,.17,.17,.17,0,10,0));
    barn.draw();
 
-   fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
-   fence.draw();
+   //fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
+   //fence.draw();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -369,7 +372,7 @@ int main(int argc,char* argv[])
    mainSpaceship.loadComponents();
    land.loadComponents();
    barn.loadComponents();
-   fence.loadComponents();
+   //fence.loadComponents();
 
    glClearColor( .73, .913, .968, 1);
    //glEnable(GL_FOG);
