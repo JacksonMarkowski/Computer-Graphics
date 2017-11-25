@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'treeParts.blend'
 # www.blender.org
-mtllib tree.mtl
+mtllib ../materials/tree.mtl
 o Cube_Cube.001
 v -0.611109 0.001860 0.755258
 v -0.451767 8.520075 0.890147

@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib cow2.mtl
+mtllib ../materials/cow.mtl
 o Cow
 v 0.094247 1.104062 -6.945837
 v 0.080998 1.049780 -6.922953
@@ -7221,7 +7221,7 @@ vn 0.6710 0.7227 0.1658
 vn -0.7326 0.6581 0.1740
 vn 0.7128 -0.6167 -0.3340
 vn -0.6734 -0.6129 -0.4134
-usemtl Material.001
+usemtl Cow_Material
 s 1
 f 1/1/1 2/2/2 3/3/3 4/4/4
 f 5/5/5 3/3/6 2/2/7 6/6/8

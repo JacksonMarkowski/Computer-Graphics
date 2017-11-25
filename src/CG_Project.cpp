@@ -41,8 +41,9 @@ double previousTime = 0;
 Spaceship mainSpaceship;
 Land land;
 Barn barn;
-//Entity barn;
-//Fence fence;
+Grass g;
+Fence fence;
+Fence fence2;
 Camera camera;
 
 /*
@@ -155,8 +156,12 @@ void display() {
    barn.setTransformation(Trans3d(-2.3,.95,-5,.17,.17,.17,0,10,0));
    barn.draw();
 
-   //fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
-   //fence.draw();
+   fence.setTransformation(Trans3d(-1.5,.95,-5,.08,.08,.08,0,0,0));
+   fence.draw();
+   fence2.setTransformation(Trans3d(-1.5,1.3,-5,.08,.08,.08,0,0,0));
+   fence2.draw();
+   g.setTransformation(Trans3d(-2,.5,0,.3,.3,.3,0,0,0));
+   g.draw();
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -372,7 +377,9 @@ int main(int argc,char* argv[])
    mainSpaceship.loadComponents();
    land.loadComponents();
    barn.loadComponents();
-   //fence.loadComponents();
+   fence.loadComponents();
+   fence2.loadComponents();
+   g.loadComponents();
 
    glClearColor( .73, .913, .968, 1);
    //glEnable(GL_FOG);

@@ -41,9 +41,6 @@ object.o: object.c CSCIx229.h
 CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	ar -rcs $@ $^
 
-C.a:Entity.o
-	ar -rcs $@ $^
-
 # Compile rules
 .c.o:
 	gcc -c $(CFLG) $<

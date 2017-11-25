@@ -1,0 +1,13 @@
+# Blender MTL File: 'barn.blend'
+# Material Count: 1
+
+newmtl Barn_Material
+Ns 20.0000
+Ka 0.500000 0.500000 0.500000
+Kd 0.840000 0.840000 0.840000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd ../textures/BarnColor.bmp

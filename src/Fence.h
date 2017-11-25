@@ -4,6 +4,8 @@
 #include "Entity.h"
 
 class Fence : public Entity {
+	protected:
+		static int fenceObj;
 	public:
 		Fence();
 		void draw();
