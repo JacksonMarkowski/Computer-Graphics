@@ -5,9 +5,9 @@
 
 class Camera {
 	private:
-		double camX = -4;
+		double camX = 3;
 		double camY = 3;
-		double camZ = 4;
+		double camZ = 3;
 
 		int th = -60;
 		int ph = 30;
@@ -18,14 +18,19 @@ class Camera {
 
 		int viewMode = PERSPECTIVE;
 	public:
-		enum CameraEnum {FIRST_PERSON, ORTHOGONAL, PERSPECTIVE};
+		enum CameraEnum {FIRST_PERSON, FOLLOW, PERSPECTIVE};
 		Camera();
-		void updateView();
+		void updateView(Ver3d followPos);
 		void updateProjection();
 		void setViewMode(CameraEnum viewMode);
+		int getViewMode();
 		void incTH(int value);
 		void incPH(int value);
 		void rotate(int th, int ph);
+		void setCamPos(double camX, double camY, double camZ);
+		//void incCamPos(double camXInc, double camYInc, double camZInc);
+		void moveCamPosForward(double forwardInc);
+		void moveCamPosSideways(double sidewaysInc);
 		void setFOV(double fov);
 		void setASP(double asp);
 		void setDIM(double dim);
@@ -36,21 +41,20 @@ Camera::Camera() {
 	//loadComponents();
 }
 
-void Camera::updateView() {
+void Camera::updateView(Ver3d followPos) {
 	switch(viewMode) {
 		case FIRST_PERSON: {
-			//Calculate where to look at based on position and view angle
 			double centerX = camX + (-2*dim*Sin(th)*Cos(ph));
 			double centerY = camY + (+2*dim        *Sin(ph));
 			double centerZ = camZ + (+2*dim*Cos(th)*Cos(ph));
 			gluLookAt(camX,camY,camZ , centerX,centerY,centerZ , 0,Cos(ph),0);
 			break;
 		}
-		case ORTHOGONAL:
-			//Standard orthogonal view
-			glRotatef(ph,1,0,0);
-			glRotatef(th,0,1,0);
+		case FOLLOW: {
+			int ph = -1*atan((followPos.y-camY)/(followPos.x-camX)) * 180 / 3.14;
+			gluLookAt(camX,camY,camZ , followPos.x,followPos.y,followPos.z , 0,Cos(ph),0);
 			break;
+		}
 		case PERSPECTIVE: {
 			//Calculate postion of view based on viewing the origin
 			double ex = -2*dim*Sin(th)*Cos(ph);
@@ -68,7 +72,7 @@ void Camera::updateProjection() {
 	//  Undo previous transformations
 	glLoadIdentity();
 	//  Perspective transformation
-	if (viewMode == FIRST_PERSON || viewMode == PERSPECTIVE)
+	if (viewMode == FIRST_PERSON || viewMode == PERSPECTIVE || viewMode == FOLLOW)
 		gluPerspective(fov,asp,dim/16,16*dim);
 	//  Orthogonal projection
 	else
@@ -81,6 +85,10 @@ void Camera::updateProjection() {
 
 void Camera::setViewMode(CameraEnum viewMode) {
 	this->viewMode = viewMode;
+}
+
+int Camera::getViewMode() {
+	return viewMode;
 }
 
 void Camera::incTH(int value) {
@@ -96,6 +104,29 @@ void Camera::incPH(int value) {
 void Camera::rotate(int th, int ph) {
 	this->th = th % 360;
 	this->ph = ph % 360;
+}
+
+void Camera::setCamPos(double camX, double camY, double camZ) {
+	this->camX = camX;
+	this->camY = camY;
+	this->camZ = camZ;
+}
+/*
+void Camera::incCamPos(double camXInc, double camYInc, double camZInc) {
+	this->camX += camXInc;
+	this->camY += camYInc;
+	this->camZ += camZInc
+}*/
+
+void Camera::moveCamPosForward(double forwardInc) {
+	this->camX += -1*forwardInc*Sin(th)*Cos(ph);
+	this->camY += +1*forwardInc        *Sin(ph);
+	this->camZ += +1*forwardInc*Cos(th)*Cos(ph);
+}
+
+void Camera::moveCamPosSideways(double sidewaysInc) {
+	this->camX += +1*sidewaysInc*Cos(th);
+	this->camZ += +1*sidewaysInc*Sin(th);
 }
 
 void Camera::setFOV(double fov) {

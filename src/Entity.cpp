@@ -29,16 +29,23 @@ void Entity::setTrans3d(Trans3d transformation) {
 	this->transformation = transformation;
 }
 
-int Entity::incX(double x) {
+double Entity::incX(double x) {
 	transformation.pos.x += x;
+	return transformation.pos.x;
 }
 
-int Entity::incY(double y) {
+double Entity::incY(double y) {
 	transformation.pos.y += y;
+	return transformation.pos.y;
 }
 
-int Entity::incZ(double z) {
+double Entity::incZ(double z) {
 	transformation.pos.z += z;
+	return transformation.pos.y;
+}
+
+Ver3d Entity::getPos() {
+	return transformation.pos;
 }
 
 void Entity::applyTrans3d(Trans3d transform) {

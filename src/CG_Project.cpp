@@ -16,9 +16,9 @@ int printInfo=0;  //  Print info
 int axes=0;       //  Display axes
 int light=1;      //  Lighting
 int dayTime = 1;
+int viewMode = 2;
 
 // Light values
-int one       =   1;  // Unit value
 int distance  =   15;  // Light distance
 int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
@@ -27,7 +27,6 @@ int emission  =   0;  // Emission intensity (%)
 int ambient   =  50;  // Ambient intensity (%)
 int diffuse   =  70;  // Diffuse intensity (%)
 int specular  =   65;  // Specular intensity (%)
-
 float ylight  =   1.4;  // Elevation of light
 
 int metalTex;
@@ -96,7 +95,7 @@ void display() {
 	//  Undo previous transformations
 	glLoadIdentity();
 	//  Perspective - set eye position
-	camera.updateView();
+	camera.updateView(mainSpaceship.getPos());
 
 	//  Flat or smooth shading
 	glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
@@ -109,7 +108,7 @@ void display() {
 		float Diffuse[]   = {(float)0.01*diffuse ,(float)0.01*diffuse ,(float)0.01*diffuse ,1.0};
 		float Specular[]  = {(float)0.01*specular,(float)0.01*specular,(float)0.01*specular,1.0};
 		//  Light position
-		float Position[]  = {(float)(distance*Cos(0)),ylight,(float)(distance*Sin(0)),1.0};
+		float Position[]  = {(float)(distance*Cos(45)),ylight,(float)(distance*Sin(45)),1.0};
 		//  Draw light position as ball (still no lighting here)
 		glColor3f(1,1,1);
 		ball(Position[0],Position[1],Position[2] , 0.1);
@@ -146,6 +145,8 @@ void display() {
 		e->draw();
 	}
 	mainSpaceship.drawBeam();
+	ball(2,1,0,.25);
+	ball(2.45,1,0,.45);
 
 	//  Draw axes - no lighting from here on
 	glDisable(GL_LIGHTING);
@@ -200,7 +201,7 @@ void idle() {
 }
 
 void enableFog(GLfloat* fogColor) {
-	glEnable(GL_FOG);
+	//glEnable(GL_FOG);
 	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogfv(GL_FOG_COLOR, fogColor);
 	glFogf(GL_FOG_START, 10.0f);
@@ -213,17 +214,16 @@ void toggleTimeOfDay() {
 		glClearColor( .73, .913, .968, 1);
 		GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
 		enableFog(fogColor); 
-
 		ambient   =  50;  // Ambient intensity (%)
 		diffuse   =  70;  // Diffuse intensity (%)
-		specular  =   65;
+		specular  =  65;  // Specular intensity (%)
 	} else {
 		glClearColor(.008,.008,.125,1);
 		GLfloat fogColor[4] = {.008f,.008f,.125f,1.0f};
 		enableFog(fogColor);
 		ambient   =  10;  // Ambient intensity (%)
 		diffuse   =  10;  // Diffuse intensity (%)
-		specular  =  45;
+		specular  =  45;  // Specular intensity (%)
 	}
 }
 
@@ -257,12 +257,6 @@ void special(int key,int x,int y) {
 		local = 1-local;
 	else if (key == GLUT_KEY_F3)
 		distance = (distance==1) ? 5 : 1;
-	//  Toggle ball increment
-	else if (key == GLUT_KEY_F8)
-		inc = (inc==10)?3:10;
-	//  Flip sign
-	else if (key == GLUT_KEY_F9)
-		one = -one;
 
 	camera.updateProjection();
 	//  Tell GLUT it is necessary to redisplay the scene
@@ -276,68 +270,82 @@ void key(unsigned char ch,int x,int y) {
 	//  Exit on ESC
 	if (ch == 27)
 		exit(0);
-	//  Toggle axes
+	//Toggle axes
 	else if (ch == 'x' || ch == 'X')
 		axes = 1-axes;
-	//  Toggle axes
+	//Toggle axes
 	else if (ch == 'i' || ch == 'I')
 		printInfo = 1-printInfo;
-	//  Toggle lighting
+	//Toggle main light(sun/moon)
 	else if (ch == 'l' || ch == 'L')
 		light = 1-light;
-	//  Switch projection mode
-	//else if (ch == 'p' || ch == 'P')
-		//mode = 1-mode;
-	//  Change field of view angle
-	//else if (ch == '-' && ch>1)
+	//Switch projection mode
+	else if (ch == 'p' || ch == 'P') {
+		int viewMode = camera.getViewMode();
+		viewMode++;
+		viewMode %= 3;
+		if (viewMode == 0) {
+			camera.setViewMode(Camera::FIRST_PERSON);
+			camera.rotate(-240,-30);
+		}
+		else if (viewMode == 1) camera.setViewMode(Camera::FOLLOW);
+		else if (viewMode == 2) {
+			camera.setViewMode(Camera::PERSPECTIVE);
+			camera.rotate(-60,30);
+		}
+	}
+	/*
+	//Change field of view angle
+	else if (ch == '-' && ch>1)
 		//ToDo: set fov in camera
-		//fov--;
-	//else if (ch == '+' && ch<179)
-		//fov++;
-	//Move forward
-	else if (ch == 'w' || ch == 'W') {
+		fov--;
+	else if (ch == '+' && ch<179)
+		fov++;
+	*/
+	//Move the spaceship forwards
+	else if (ch == 'w') {
 		mainSpaceship.incX(-.2);
 	}
-	//Move left
-	else if (ch == 'a' || ch == 'A') {
+	//Move the spaceship left
+	else if (ch == 'a') {
 		mainSpaceship.incZ(.2);
 	}
-	//Move right
-	else if (ch == 'd' || ch == 'D') {
+	//Move the spaceship right
+	else if (ch == 'd') {
 		mainSpaceship.incZ(-.2);
 	}
-	//Move backwards
-	else if (ch == 's' || ch == 'S') {
+	//Move the spaceship backwards
+	else if (ch == 's') {
 		mainSpaceship.incX(.2);
 	}
-	else if (ch == 32) {
-		mainSpaceship.incY(.2);
+	//Move the spaceship up
+	else if (ch == 'e' || ch == 'E') {
+		mainSpaceship.incY(.1);
 	}
-	//  Light elevation
-	else if (ch=='[')
-		ylight -= 0.1;
-	else if (ch==']')
-		ylight += 0.1;
-	//  Ambient level
-	/*
-	else if (ch=='a' && ambient>0)
-		ambient -= 5;
-	else if (ch=='A' && ambient<100)
-		ambient += 5;
-	//  Diffuse level
-	else if (ch=='d' && diffuse>0)
-		diffuse -= 5;
-	else if (ch=='D' && diffuse<100)
-		diffuse += 5;
-	//  Specular level
-	else if (ch=='s' && specular>0)
-		specular -= 5;
-	else if (ch=='S' && specular<100)
-		specular += 5;*/
+	//Mode the spaceship down
+	else if (ch == 'q' || ch == 'Q') {
+		mainSpaceship.incY(-.1);
+	}
+	//Move camera position forwards
+	else if (ch == 'W') {
+		camera.moveCamPosForward(.2);
+	}
+	//Move camera position left
+	else if (ch == 'A') {
+		camera.moveCamPosSideways(.2);
+	}
+	//Move camera position right
+	else if (ch == 'D') {
+		camera.moveCamPosSideways(-.2);
+	}
+	//Move camera position backwards
+	else if (ch == 'S') {
+		camera.moveCamPosForward(-.2);
+	}
+	//Toggle the time of day(night or day)
 	else if (ch=='t' || ch=='T') {
 		toggleTimeOfDay();
 	}
-
 
 	camera.updateProjection();
 	glutPostRedisplay();
@@ -437,7 +445,7 @@ int main(int argc,char* argv[]) {
 	glutInit(&argc,argv);
 	//  Request double buffered, true color window with Z buffering at 600x600
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-	glutInitWindowSize(650,500);
+	glutInitWindowSize(1000,800);
 	glutCreateWindow("Jackson Markowski");
 	//  Set callbacks
 	glutDisplayFunc(display);

@@ -17,9 +17,10 @@ class Entity {
 		virtual void loadComponents();
 		void update(double elapsedTime);
 		void setTrans3d(Trans3d transformation);
-		int incX(double x);
-		int incY(double y);
-		int incZ(double z);
+		double incX(double x);
+		double incY(double y);
+		double incZ(double z);
+		Ver3d getPos();
 };
 
 #endif
