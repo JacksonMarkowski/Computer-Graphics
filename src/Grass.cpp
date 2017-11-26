@@ -8,7 +8,7 @@ void Grass::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);
 
-	glColor3f(1, 1, 1);
+	glColor3f(.63, .63, .45);
 	glCallList(obj);
 
 	glPopMatrix();

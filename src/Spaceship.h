@@ -11,7 +11,9 @@ struct light {
 class Spaceship : public Entity {
 	private:
 		int metalSecTex, domeRingTex, domeTex;
-		struct light lights[8];
+		int lights = 0;
+		struct light fakeLightI[8];
+		void init(int lightsOn);
 
 		void drawWingPanel(Trans3d transform, int texture);
 		void drawWingPanelSideEdge(Trans3d transform, int texture, double normal, double emission);
@@ -29,11 +31,15 @@ class Spaceship : public Entity {
 		
 		void applyMetalMaterial();
 		void applyLightMaterial();
+
 	public:
 		Spaceship();
+		Spaceship(int lightsOn);
 		void update(double time);
 		void draw();
 		void loadComponents();
+		void setBeamOnOff(int lights);
+		void drawBeam();
 };
 
 #endif

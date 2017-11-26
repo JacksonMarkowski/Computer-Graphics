@@ -2,7 +2,6 @@
 #include "Trans3d.h"
 #include <list>
 
-//#include "Entity.cpp"
 #include "Entity.h"
 #include "Spaceship.h"
 #include "Terrain.h"
@@ -13,11 +12,10 @@
 #include "Cow.h"
 #include "Camera.cpp"
 
-int printInfo=0;
+int printInfo=0;  //  Print info
 int axes=0;       //  Display axes
-int move2=1;       //  Move light
-
 int light=1;      //  Lighting
+int dayTime = 1;
 
 // Light values
 int one       =   1;  // Unit value
@@ -29,9 +27,7 @@ int emission  =   0;  // Emission intensity (%)
 int ambient   =  50;  // Ambient intensity (%)
 int diffuse   =  70;  // Diffuse intensity (%)
 int specular  =   65;  // Specular intensity (%)
-int shininess =   4;  // Shininess (power of two)
-float shiny   =   1;  // Shininess (value)
-int zh        =  90;  // Light azimuth
+
 float ylight  =   1.4;  // Elevation of light
 
 int metalTex;
@@ -68,7 +64,7 @@ static void ball(double x,double y,double z,double r) {
 	glScaled(r,r,r);
 	//  White ball
 	glColor3f(1,1,1);
-	glMaterialf(GL_FRONT,GL_SHININESS,shiny);
+	glMaterialf(GL_FRONT,GL_SHININESS,100);
 	glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
 	glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
 	//  Bands of latitude
@@ -106,6 +102,7 @@ void display() {
 	glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
 
 	//  Light switch
+	
 	if (light) {
 		//  Translate intensity to color vectors
 		float Ambient[]   = {(float)0.01*ambient ,(float)0.01*ambient ,(float)0.01*ambient ,1.0};
@@ -132,11 +129,13 @@ void display() {
 		glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
 		glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
 		glLightfv(GL_LIGHT0,GL_POSITION,Position);
-	} else glDisable(GL_LIGHTING);
+	} else {
+		glDisable(GL_LIGHT0);
+		glDisable(GL_LIGHTING);
+	}; 
 
 	double elapsedTime = currentTime - previousTime;
 
-	mainSpaceship.setTrans3d(Trans3d(0,1.5,0,.5,.5,.5,0,zh,0));
 	mainSpaceship.update(elapsedTime);
 	mainSpaceship.draw();
 
@@ -146,6 +145,7 @@ void display() {
 		e->update(elapsedTime);
 		e->draw();
 	}
+	mainSpaceship.drawBeam();
 
 	//  Draw axes - no lighting from here on
 	glDisable(GL_LIGHTING);
@@ -178,7 +178,7 @@ void display() {
 			glWindowPos2i(5,45);
 			Print("Model=%s LocalViewer=%s Distance=%d Elevation=%.1f",smooth?"Smooth":"Flat",local?"On":"Off",distance,ylight);
 			glWindowPos2i(5,25);
-			Print("Ambient=%d  Diffuse=%d Specular=%d Emission=%d Shininess=%.0f",ambient,diffuse,specular,emission,shiny);
+			Print("Ambient=%d  Diffuse=%d Specular=%d",ambient,diffuse,specular);
 		}
 	}
 
@@ -192,13 +192,39 @@ void display() {
  *  GLUT calls this routine when the window is resized
  */
 void idle() {
-	//  Elapsed time in seconds
+
 	previousTime = currentTime;
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
-	//printf("%f\n", time);
-	zh = fmod(90*currentTime/1000.0,360.0);
-	//  Tell GLUT it is necessary to redisplay the scene
+
 	glutPostRedisplay();
+}
+
+void enableFog(GLfloat* fogColor) {
+	glEnable(GL_FOG);
+	glFogf(GL_FOG_MODE, GL_LINEAR);
+	glFogfv(GL_FOG_COLOR, fogColor);
+	glFogf(GL_FOG_START, 10.0f);
+	glFogf(GL_FOG_END, 15.0f);
+}
+
+void toggleTimeOfDay() {
+	dayTime = 1-dayTime;
+	if (dayTime) {
+		glClearColor( .73, .913, .968, 1);
+		GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
+		enableFog(fogColor); 
+
+		ambient   =  50;  // Ambient intensity (%)
+		diffuse   =  70;  // Diffuse intensity (%)
+		specular  =   65;
+	} else {
+		glClearColor(.008,.008,.125,1);
+		GLfloat fogColor[4] = {.008f,.008f,.125f,1.0f};
+		enableFog(fogColor);
+		ambient   =  10;  // Ambient intensity (%)
+		diffuse   =  10;  // Diffuse intensity (%)
+		specular  =  45;
+	}
 }
 
 /*
@@ -250,10 +276,6 @@ void key(unsigned char ch,int x,int y) {
 	//  Exit on ESC
 	if (ch == 27)
 		exit(0);
-	//  Reset view angle
-	else if (ch == '0') {
-		camera.rotate(40, 25);
-	}
 	//  Toggle axes
 	else if (ch == 'x' || ch == 'X')
 		axes = 1-axes;
@@ -266,26 +288,38 @@ void key(unsigned char ch,int x,int y) {
 	//  Switch projection mode
 	//else if (ch == 'p' || ch == 'P')
 		//mode = 1-mode;
-	//  Toggle light movement
-	else if (ch == 'm' || ch == 'M')
-		move2 = 1-move2;
-	//  Move light
-	else if (ch == '<')
-		zh += 1;
-	else if (ch == '>')
-		zh -= 1;
 	//  Change field of view angle
 	//else if (ch == '-' && ch>1)
 		//ToDo: set fov in camera
 		//fov--;
 	//else if (ch == '+' && ch<179)
 		//fov++;
+	//Move forward
+	else if (ch == 'w' || ch == 'W') {
+		mainSpaceship.incX(-.2);
+	}
+	//Move left
+	else if (ch == 'a' || ch == 'A') {
+		mainSpaceship.incZ(.2);
+	}
+	//Move right
+	else if (ch == 'd' || ch == 'D') {
+		mainSpaceship.incZ(-.2);
+	}
+	//Move backwards
+	else if (ch == 's' || ch == 'S') {
+		mainSpaceship.incX(.2);
+	}
+	else if (ch == 32) {
+		mainSpaceship.incY(.2);
+	}
 	//  Light elevation
 	else if (ch=='[')
 		ylight -= 0.1;
 	else if (ch==']')
 		ylight += 0.1;
 	//  Ambient level
+	/*
 	else if (ch=='a' && ambient>0)
 		ambient -= 5;
 	else if (ch=='A' && ambient<100)
@@ -299,39 +333,20 @@ void key(unsigned char ch,int x,int y) {
 	else if (ch=='s' && specular>0)
 		specular -= 5;
 	else if (ch=='S' && specular<100)
-		specular += 5;
-	//  Emission level
-	else if (ch=='e' && emission>0)
-		emission -= 5;
-	else if (ch=='E' && emission<100)
-		emission += 5;
-	//  Shininess level
-	else if (ch=='n' && shininess>-1)
-		shininess -= 1;
-	else if (ch=='N' && shininess<7)
-		shininess += 1;
-	//  Translate shininess power to value (-1 => 0)
-	shiny = shininess<0 ? 0 : pow(2.0,shininess);
-	//  Reproject
+		specular += 5;*/
+	else if (ch=='t' || ch=='T') {
+		toggleTimeOfDay();
+	}
+
+
 	camera.updateProjection();
-	//  Animate if requested
-	//glutIdleFunc(move2?idle:NULL);
-	//  Tell GLUT it is necessary to redisplay the scene
 	glutPostRedisplay();
 }
 
-/*
- *  GLUT calls this routine when the window is resized
- */
 void reshape(int width,int height) {
-	//  Ratio of the width to the height of the window
-	//asp = (height>0) ? (double)width/height : 1;
 	camera.setASP((height>0) ? (double)width/height : 1);
-		//  Set the viewport to the entire window
 	glViewport(0,0, width,height);
-	//  Set projection
 	camera.updateProjection();
-	//Project(mode?fov:0,asp,dim);
 }
 
 void newEntity(Entity* e, Trans3d trans) {
@@ -342,13 +357,15 @@ void newEntity(Entity* e, Trans3d trans) {
 
 void generateEntities() {
 	//ToDo: add spaceship and land to entities list
+	mainSpaceship.setBeamOnOff(1);
 	mainSpaceship.loadComponents();
+	mainSpaceship.setTrans3d(Trans3d(0,1.5,0,.5,.5,.5,0,0,0));
 
 	land.loadComponents();
 	land.setTrans3d(Trans3d(0,0,0,1,1,1,0,0,0));
 
-	newEntity(new Spaceship(), Trans3d(.35,.56,-1.7,.45,.45,.45,-40,0,155));
-	
+	newEntity(new Spaceship(0), Trans3d(.35,.56,-1.7,.45,.45,.45,-40,0,155));
+
 	newEntity(new Barn(), Trans3d(-2.3,.95,-5,.17,.17,.17,0,10,0));
 
 	newEntity(new Fence(), Trans3d(-1.76,.95,-6,.08,.08,.08,0,0,-5.0));
@@ -366,6 +383,50 @@ void generateEntities() {
 	newEntity(new Fence(), Trans3d(-2.55,.57,-1.740,.08,.08,.08,8,0,1.9));
 	newEntity(new Fence(), Trans3d(-1.461,.57,-1.733,.08,.08,.08,4,0,-3));
 	newEntity(new Fence(), Trans3d(-.395,.52,-1.733,.08,.08,.08,0,5,-20));
+
+	newEntity(new Cow(), Trans3d(-.395,.78,-3,.075,.075,.075,8,5,-5));
+	newEntity(new Cow(), Trans3d(-.335,.793,-3.6,.04,.04,.04,8,10,-5));
+	newEntity(new Cow(), Trans3d(-1.8,.70,-2.3,.075,.075,.075,8,-35,0));
+	newEntity(new Cow(), Trans3d(2,.18,-5,.075,.075,.075,-14,-115,0));
+	newEntity(new Cow(), Trans3d(2.3,.18,-3.2,.075,.075,.075,15,90,0));
+	newEntity(new Cow(), Trans3d(.6,.58,-4.1,.075,.075,.075,15,115,0));
+	newEntity(new Cow(), Trans3d(1.3,.2,-1.7,.075,.075,.075,13,45,0));
+	newEntity(new Cow(), Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
+	newEntity(new Cow(), Trans3d(1.2,-.290,.8,.075,.075,.075,-13,-170,9));
+	newEntity(new Cow(), Trans3d(3.4,-.16,-1.5,.071,.071,.071,-20,150,10));
+
+	newEntity(new Grass(), Trans3d(4.622539,-0.174740,-1.986022,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(6.062681,-0.092031,-3.991504,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-4.044989,1.036037,7.207368,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-5.288940,1.410261,-7.336454,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(1.023460,-0.800339,5.496870,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(1.323048,-0.897072,3.615448,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(3.862478,-1.231678,4.978537,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-6.128201,0.141514,0.894430,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-4.332521,0.477872,1.890721,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-7.348161,1.893830,6.342370,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-2.214361,0.116329,0.995587,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(3.188903,-0.535863,-0.060798,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(6.681075,-0.320906,0.398634,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(2.378507,0.162876,-6.200283,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-4.107805,0.937009,5.054699,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-3.038216,1.065222,-6.426837,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-1.212804,0.928409,-4.401934,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-4.205161,1.056785,-7.925969,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(7.586384,0.209521,-1.219835,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-3.470562,0.931057,6.937594,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(7.232677,0.143107,-4.361171,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-2.139071,0.331691,-0.845998,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(6.421673,-0.575139,5.705108,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(-7.176999,1.080124,-2.729841,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(5.917944,-0.034262,-5.769783,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(0.125830,-0.386250,7.174212,.08,.08,.08,0,0,0));
+	newEntity(new Grass(), Trans3d(7.930378,-0.080872,7.669943,.08,.08,.08,0,0,0));
+
+	newEntity(new Tree(), Trans3d(-5.940419,1.328664,-3.087941,.1,.1,.1,0,0,0));
+	newEntity(new Tree(), Trans3d(-4.25291,0.336103,-0.21,.13,.13,.13,0,45,0));
+	newEntity(new Tree(), Trans3d(.462,.54,-6.9,.08,.08,.08,0,100,0));
+
 }
 
 /*
@@ -386,15 +447,10 @@ int main(int argc,char* argv[]) {
 	glutIdleFunc(idle);
 
 	generateEntities();
-	//g.loadComponents();
 
 	glClearColor( .73, .913, .968, 1);
-	//glEnable(GL_FOG);
-	glFogf(GL_FOG_MODE, GL_LINEAR);
 	GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
-	glFogfv(GL_FOG_COLOR, fogColor);
-	glFogf(GL_FOG_START, 10.0f);
-	glFogf(GL_FOG_END, 15.0f);
+	enableFog(fogColor);
 
 	//  Pass control to GLUT so it can interact with the user
 	ErrCheck("init");

@@ -1,16 +1,30 @@
 #include "Spaceship.h"
 
 Spaceship::Spaceship() {
-	//metalTex = LoadTexBMP("Metal.bmp");
-	lights[0].value = 1.0; lights[0].brightening = 0;
-	lights[1].value = .75; lights[1].brightening = 1;
-	lights[2].value = .5; lights[2].brightening = 1;
-	lights[3].value = .25; lights[3].brightening = 1;
-	lights[4].value = .0; lights[4].brightening = 1;
-	lights[5].value = .25; lights[5].brightening = 0;
-	lights[6].value = .5; lights[6].brightening = 0;
-	lights[7].value = .75; lights[7].brightening = 0;
+	init(1);
+}
 
+Spaceship::Spaceship(int lightsOn) {
+	init(lightsOn);
+
+}
+
+void Spaceship::init(int lightsOn) {
+	if (lightsOn) {
+		fakeLightI[0].value = 1.0; fakeLightI[0].brightening = 0;
+		fakeLightI[1].value = .75; fakeLightI[1].brightening = 1;
+		fakeLightI[2].value = .5; fakeLightI[2].brightening = 1;
+		fakeLightI[3].value = .25; fakeLightI[3].brightening = 1;
+		fakeLightI[4].value = .0; fakeLightI[4].brightening = 1;
+		fakeLightI[5].value = .25; fakeLightI[5].brightening = 0;
+		fakeLightI[6].value = .5; fakeLightI[6].brightening = 0;
+		fakeLightI[7].value = .75; fakeLightI[7].brightening = 0;
+	} else {
+		for (int i = 0; i < 8; i++) {
+			fakeLightI[i].value = 0.0;
+			fakeLightI[i].brightening = 0.0;
+		}
+	}
 }
 
 void Spaceship::update(double elapsedTime) {
@@ -19,25 +33,24 @@ void Spaceship::update(double elapsedTime) {
 	for (int i = 0; i < 8; i++) {
 		double remainingChange = lightChange;
 		while (remainingChange != 0) {
-			if (lights[i].brightening) {
-				lights[i].value += remainingChange;
-				if (lights[i].value >= 1.0) {
-					remainingChange = lights[i].value - 1;
-					lights[i].value = 1.0;
-					lights[i].brightening = 0;
+			if (fakeLightI[i].brightening) {
+				fakeLightI[i].value += remainingChange;
+				if (fakeLightI[i].value >= 1.0) {
+					remainingChange = fakeLightI[i].value - 1;
+					fakeLightI[i].value = 1.0;
+					fakeLightI[i].brightening = 0;
 				} else remainingChange = 0;
 			} else {
-				lights[i].value -= remainingChange;
-				if (lights[i].value <= 0.0) {
-					remainingChange = fabs(lights[i].value);
-					lights[i].value = 0.0;
-					lights[i].brightening = 1;
+				fakeLightI[i].value -= remainingChange;
+				if (fakeLightI[i].value <= 0.0) {
+					remainingChange = fabs(fakeLightI[i].value);
+					fakeLightI[i].value = 0.0;
+					fakeLightI[i].brightening = 1;
 				} else remainingChange = 0;
 			}
 		}
 	}
-	//lightOnDeg += fmod(360*elapsedTime/1000.0,360.0);
-	//lightOnDeg %= 360;
+	transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
 
 }
 
@@ -48,8 +61,8 @@ void Spaceship::draw() {
 	
 	for(i = 0; i < 360; i+=45) {
 		drawWingPanel(Trans3d (0,0,0,1,1,1,0,i,0), metalSecTex);
-		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metalSecTex, -1, lights[i/45].value);
-		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i-36,0), metalSecTex, 1, lights[i/45].value);
+		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metalSecTex, -1, fakeLightI[i/45].value);
+		drawWingPanelSideEdge(Trans3d (0,0,0,1,1,1,0,i-36,0), metalSecTex, 1, fakeLightI[i/45].value);
 		drawWingPanelInsideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metalSecTex);
 		drawWingPanelOutsideEdge(Trans3d (0,0,0,1,1,1,0,i,0), metalSecTex);
 		drawDomePanel(Trans3d (0,.42,0,.8,.6,.8,0,i,0), domeTex);
@@ -69,13 +82,72 @@ void Spaceship::draw() {
 	drawBottomOpeningRing(Trans3d (0,-.51,0,.82,1,.82,180,0,0), metalSecTex);
 
 	glPopMatrix();
-
 }
 
 void Spaceship::loadComponents() {
 	metalSecTex = LoadTexBMP("../textures/MetalSec.bmp");
 	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
 	domeTex = LoadTexBMP("../textures/MetalSecDome.bmp");
+}
+
+void Spaceship::setBeamOnOff(int lights) {
+	this->lights = lights;
+}
+
+void Spaceship::drawBeam() {
+	if (lights) {
+		glPushMatrix();
+		applyTrans3d(transformation);
+
+		float Ambient[] = {.188,.78,.81,1.0};
+		float Diffuse[] = {.188,.78,.81,1.0};
+		float Specular[] = {.188,.78,.81,1.0};
+		//  Light position
+		float Position[]  = {(float)0,(float)-.72,(float)0,1.0};
+
+		glEnable(GL_NORMALIZE);
+		glEnable(GL_LIGHTING);
+		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,0);
+
+		//glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+		//glEnable(GL_COLOR_MATERIAL);
+		
+		glEnable(GL_LIGHT1);
+		// Set ambient, diffuse, specular components and position of light 0
+		glLightfv(GL_LIGHT1,GL_AMBIENT ,Ambient);
+		glLightfv(GL_LIGHT1,GL_DIFFUSE ,Diffuse);
+		glLightfv(GL_LIGHT1,GL_SPECULAR,Specular);
+		glLightfv(GL_LIGHT1,GL_POSITION,Position);
+		glLightf(GL_LIGHT1,GL_SPOT_CUTOFF, 90.0);
+		GLfloat spotDirection[] = {0.0,-3.0,0.0};
+		glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION, spotDirection);
+		glLightf(GL_LIGHT1,GL_SPOT_EXPONENT, 4);
+
+		
+
+		double r1 = 5;
+		double r2 = .4;
+		double height = 7;
+		double normalY = atan((r1-r2)/height)*2/3.1415926;
+		glColor4f(.125, .635, .73, .4);
+
+		//Draws the frustum by drawing the next vertex rad over
+		glDisable(GL_COLOR_MATERIAL);
+		glBegin(GL_QUAD_STRIP);
+		for (int i = 0; i <= 360; i += 4) {
+		  //double color = (cos(i)*cos(i) + 1) / 2;
+		  //glColor3f(color, color, color);
+		  glNormal3d(Cos(i),normalY,Sin(i));
+		  glTexCoord2f(i/360, 1.0); glVertex3d(Cos(i) * r2, -.72, Sin(i) * r2);
+
+		  glNormal3d(Cos(i),1,Sin(i));
+		  glTexCoord2f(i/360, 0.0); glVertex3d(Cos(i) * r1, 0-height, Sin(i) * r1);
+		}
+		glEnd();
+		glEnable(GL_COLOR_MATERIAL);
+		glPopMatrix();
+	}
+
 }
 
 void Spaceship::drawWingPanel(Trans3d transform, int texture) {
@@ -92,7 +164,7 @@ void Spaceship::drawWingPanel(Trans3d transform, int texture) {
 
 	double j;
 	double d = .05;
-   
+	
 	for (j = 0; j < 1; j += d) {
 		double r1 = 2 - j;
 		double r2 = 2 - (j+d);
@@ -160,7 +232,7 @@ void Spaceship::drawWingPanelInsideEdge(Trans3d transform, int texture) {
 
 	glBegin(GL_QUAD_STRIP);
 	for (i = 0; i <= 36; i += d) {
-         
+		 
 		glNormal3d(-Cos(i),0,-Sin(i));
 		glVertex3d(Cos(i) * r2, yVer-1, Sin(i) * r2);
 		glVertex3d(Cos(i) * r2, yVer-1.1, Sin(i) * r2);
@@ -185,17 +257,17 @@ void Spaceship::drawWingPanelOutsideEdge(Trans3d transform, int texture) {
 	glBindTexture(GL_TEXTURE_2D,texture);
 
 	double j = 0;
-  	double r1 = 2 - j;
-  	double r2 = 2.05;
-  	double yVer = pow(j+1,0.5);
-  	double y1 = yVer - 1;
-  	double y2 = yVer - 1.11;
-   
-  	quadStripRotationTex(startDegree,startDegree+36,4.0,r1,r2,y1,y2,.705, r1/2, r2/2);
+	double r1 = 2 - j;
+	double r2 = 2.05;
+	double yVer = pow(j+1,0.5);
+	double y1 = yVer - 1;
+	double y2 = yVer - 1.11;
+	
+	quadStripRotationTex(startDegree,startDegree+36,4.0,r1,r2,y1,y2,.705, r1/2, r2/2);
 
-  	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 
-  	glPopMatrix();
+	glPopMatrix();
 }
 
 void Spaceship::drawWingBase(Trans3d transform, int texture, double upToj) {
@@ -247,7 +319,7 @@ void Spaceship::drawDomePanel(Trans3d transform, int texture) {
 		double y1 = pow(j,0.5);
 		double y2 = pow(j+d,0.5);
 		double normalY = atan(2 * sqrt(j+d)) / 1.5707;
-      
+	  
 		quadStripRotationTex(startDegree,startDegree+45,5.0,r1,r2,y1,y2,normalY,r1,r2);
 	}
 
@@ -276,7 +348,7 @@ void Spaceship::drawDomeRing(Trans3d transform, int texture) {
 	quadStripRotationTex(0,360,4.0,r3,r1,-.0915,0,.472,1,.9);
 
 	glDisable(GL_TEXTURE_2D);
-   
+	
 	glPopMatrix();
 }
 
@@ -292,7 +364,7 @@ void Spaceship::drawCenterRing(Trans3d transform, int texture) {
 
 	double r1 = 2;
 	double r2 = 2.05;
-       
+		
 	quadStripRotationTex(0,360,4.0,r1,r2,.1,.09,.874,2/2.05,1);
 	quadStripRotationTex(0,360,4.0,r2,r1,.09,.05,-.57,1,2/2.05);
 	quadStripRotationTex(0,360,4.0,r1,r2,.05,.01,.57,2/2.05,1);
@@ -302,7 +374,7 @@ void Spaceship::drawCenterRing(Trans3d transform, int texture) {
 
 	//glColor4f(.768, .16, .05, .6);
 	for (double i = 13.25; i < 360; i+=22.5) {
-		double emission = lights[((int)i)/45].value;
+		double emission = fakeLightI[((int)i)/45].value;
 		if (emission > .7) glColor4f(1+(emission*.6), .1, .1, .8);
 		else glColor4f(.494, .1, .1, .8);
 		for (double j = 0; j <= 8; j += 4) {
@@ -316,7 +388,7 @@ void Spaceship::drawCenterRing(Trans3d transform, int texture) {
 		}
 	}
 	glDisable(GL_TEXTURE_2D);
-   
+	
 	glPopMatrix();
 }
 
@@ -332,7 +404,7 @@ void Spaceship::drawBottomOpening(Trans3d transform, int texture) {
 
 	double j;
 	double d = .05;
-   
+	
 	for (j = 0; j < .2; j += d) {
 		double r1 = 2 - j;
 		double r2 = 2 - (j+d);
@@ -344,17 +416,17 @@ void Spaceship::drawBottomOpening(Trans3d transform, int texture) {
 	}
 
 	for (j = .2; j < .8; j += d) {
-  		double r1 = 2 - j;
-  		double r2 = 2 - (j+d);
-  		double y1 = pow(j+1,0.5)-1;
-  		double y2 = pow(j+d+1,0.5)-1;
-  		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
+		double r1 = 2 - j;
+		double r2 = 2 - (j+d);
+		double y1 = pow(j+1,0.5)-1;
+		double y2 = pow(j+d+1,0.5)-1;
+		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
 
-  		double z;
-  		for (z = 0; z < 360; z+=72) {
-  			glColor3f(.5, .5, .5);
+		double z;
+		for (z = 0; z < 360; z+=72) {
+			glColor3f(.5, .5, .5);
 			applyMetalMaterial();
-  			glEnable(GL_TEXTURE_2D);
+			glEnable(GL_TEXTURE_2D);
 			quadStripRotationTex(0+z,32+z,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);
 			glDisable(GL_TEXTURE_2D);
 
@@ -372,7 +444,7 @@ void Spaceship::drawBottomOpening(Trans3d transform, int texture) {
 		double y1 = pow(j+1,0.5)-1;
 		double y2 = pow(j+d+1,0.5)-1;
 		double normalY = atan(2 * sqrt(j+d+1)) / 1.5707;
-      
+	  
 		quadStripRotationTex(0,360,4.0,r1,r2,y1,y2,normalY,r1/2,r2/2);		
 	}
 
@@ -393,11 +465,11 @@ void Spaceship::drawBottomOpeningRing(Trans3d transform, int texture) {
 
 	double r1 = 1;
 	double r2 = .1;
-   
+	
 	quadStripRotationTex(0,360,4.0,r1,r2,0,.05,.96,r1,r2);	
 
 	glDisable(GL_TEXTURE_2D);
-   
+	
 	glPopMatrix();
 }
 
