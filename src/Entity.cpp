@@ -4,6 +4,10 @@ Entity::Entity() {
 	//loadComponents();
 }
 
+Entity::~Entity() {
+	//ToDo: free stuff
+}
+
 void Entity::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

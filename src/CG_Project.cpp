@@ -4,6 +4,7 @@
 
 #include "Entity.h"
 #include "Spaceship.h"
+#include "SmokeCloud.h"
 #include "Terrain.h"
 #include "Barn.h"
 #include "Fence.h"
@@ -32,9 +33,12 @@ float ylight  =   1.4;  // Elevation of light
 int metalTex;
 
 double currentTime = 0;
-double previousTime = 0;
+double elapsedTime = 0;
+
+double elapsedSmokeGeneration = 0;
 
 std::list<Entity*> entities;
+std::list<SmokeCloud*> smokeClouds;
 Spaceship mainSpaceship;
 Terrain land;
 Camera camera;
@@ -133,20 +137,32 @@ void display() {
 		glDisable(GL_LIGHTING);
 	}; 
 
-	double elapsedTime = currentTime - previousTime;
-
 	mainSpaceship.update(elapsedTime);
 	mainSpaceship.draw();
 
 	land.draw();
+
+	/*
+	for (SmokeCloud* c : smokeClouds) {
+		if (!c->update(elapsedTime)) {
+			smokeClouds.remove(c);
+			//free(c);
+		} else c->draw();
+	}*/
+	for (std::list<SmokeCloud*>::iterator it = smokeClouds.begin(); it != smokeClouds.end(); ++it) {
+		if (!(*it)->update(elapsedTime)) {
+			delete (*it);
+			smokeClouds.erase(it);
+		} else (*it)->draw();
+	}
 
 	for (Entity* e : entities) {
 		e->update(elapsedTime);
 		e->draw();
 	}
 	mainSpaceship.drawBeam();
-	ball(2,1,0,.25);
-	ball(2.45,1,0,.45);
+	//ball(2,1,0,.25);
+	//ball(2.45,1,0,.45);
 
 	//  Draw axes - no lighting from here on
 	glDisable(GL_LIGHTING);
@@ -189,13 +205,30 @@ void display() {
 	glutSwapBuffers();
 }
 
+void generateSmokeClouds() {
+	double timeBetweenGeneration = 2500.0;
+	elapsedSmokeGeneration += elapsedTime;
+	while (elapsedSmokeGeneration > timeBetweenGeneration) {
+		SmokeCloud* cloud = new SmokeCloud();
+
+		cloud->setTrans3d(Trans3d(.35,.56,-1.7,1,1,1,0,0,0));
+
+		smokeClouds.push_back(cloud);
+
+		elapsedSmokeGeneration -= timeBetweenGeneration;
+	}
+}
+
 /*
  *  GLUT calls this routine when the window is resized
  */
 void idle() {
 
-	previousTime = currentTime;
+	double previousTime = currentTime;
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
+	elapsedTime = currentTime - previousTime;
+
+	generateSmokeClouds();
 
 	glutPostRedisplay();
 }

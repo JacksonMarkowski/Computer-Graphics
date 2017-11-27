@@ -13,6 +13,7 @@ class Entity {
 		void applyTrans3d(Trans3d transform);
 	public:
 		Entity();
+		virtual ~Entity();
 		virtual void draw();
 		virtual void loadComponents();
 		void update(double elapsedTime);
