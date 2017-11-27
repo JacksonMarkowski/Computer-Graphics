@@ -4,6 +4,10 @@ Terrain::Terrain() {
 	//loadComponents();
 }
 
+Terrain::~Terrain() {
+
+}
+
 void Terrain::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

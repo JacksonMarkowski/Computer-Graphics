@@ -8,6 +8,7 @@ class Grass : public Entity {
 		
 	public:
 		Grass();
+		~Grass();
 		void draw();
 		void loadComponents();
 };

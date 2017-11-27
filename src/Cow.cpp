@@ -4,6 +4,10 @@ Cow::Cow() {
 	//loadComponents();
 }
 
+Cow::~Cow() {
+	
+}
+
 void Cow::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

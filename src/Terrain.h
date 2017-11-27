@@ -6,6 +6,7 @@
 class Terrain : public Entity {
 	public:
 		Terrain();
+		~Terrain();
 		void draw();
 		void loadComponents();
 };

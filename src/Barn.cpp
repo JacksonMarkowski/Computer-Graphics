@@ -4,6 +4,10 @@ Barn::Barn() {
 	//loadComponents();
 }
 
+Barn::~Barn() {
+	
+}
+
 void Barn::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

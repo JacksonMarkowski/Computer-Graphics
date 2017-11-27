@@ -8,6 +8,7 @@ class Tree : public Entity {
 		
 	public:
 		Tree();
+		~Tree();
 		void draw();
 		void loadComponents();
 };

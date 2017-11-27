@@ -8,6 +8,7 @@ class Fence : public Entity {
 		static int fenceObj;
 	public:
 		Fence();
+		~Fence();
 		void draw();
 		void loadComponents();
 };

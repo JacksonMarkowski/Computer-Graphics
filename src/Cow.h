@@ -8,6 +8,7 @@ class Cow : public Entity {
 
 	public:
 		Cow();
+		~Cow();
 		void draw();
 		void loadComponents();
 };

@@ -34,6 +34,7 @@ class Spaceship : public Entity {
 
 	public:
 		Spaceship();
+		~Spaceship();
 		Spaceship(int lightsOn);
 		void update(double time);
 		void draw();

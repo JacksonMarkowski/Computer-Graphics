@@ -6,6 +6,7 @@
 class Barn : public Entity {
 	public:
 		Barn();
+		~Barn();
 		void draw();
 		void loadComponents();
 };

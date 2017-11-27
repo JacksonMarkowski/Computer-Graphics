@@ -4,6 +4,10 @@ Grass::Grass() {
 	//loadComponents();
 }
 
+Grass::~Grass() {
+	
+}
+
 void Grass::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

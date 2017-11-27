@@ -6,6 +6,10 @@ Fence::Fence() {
 	//loadComponents();
 }
 
+Fence::~Fence() {
+	
+}
+
 void Fence::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);

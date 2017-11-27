@@ -4,6 +4,10 @@ Spaceship::Spaceship() {
 	init(1);
 }
 
+Spaceship::~Spaceship() {
+	
+}
+
 Spaceship::Spaceship(int lightsOn) {
 	init(lightsOn);
 

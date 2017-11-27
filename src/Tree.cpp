@@ -4,6 +4,10 @@ Tree::Tree() {
 	//loadComponents();
 }
 
+Tree::~Tree() {
+
+}
+
 void Tree::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);
