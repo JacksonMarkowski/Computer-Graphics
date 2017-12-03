@@ -151,8 +151,11 @@ void display() {
 	}*/
 	for (std::list<SmokeCloud*>::iterator it = smokeClouds.begin(); it != smokeClouds.end(); ++it) {
 		if (!(*it)->update(elapsedTime)) {
-			delete (*it);
-			smokeClouds.erase(it);
+			SmokeCloud* c = (*it);
+			it = smokeClouds.erase(it);
+			(*it)->update(elapsedTime);
+			(*it)->draw();
+			//delete(c);
 		} else (*it)->draw();
 	}
 
@@ -211,7 +214,7 @@ void generateSmokeClouds() {
 	while (elapsedSmokeGeneration > timeBetweenGeneration) {
 		SmokeCloud* cloud = new SmokeCloud();
 
-		cloud->setTrans3d(Trans3d(.35,.56,-1.7,1,1,1,0,0,0));
+		cloud->setTrans3d(Trans3d(.35,.7,-1.7,.11,.11,.11,0,0,0));
 
 		smokeClouds.push_back(cloud);
 
@@ -234,7 +237,7 @@ void idle() {
 }
 
 void enableFog(GLfloat* fogColor) {
-	//glEnable(GL_FOG);
+	glEnable(GL_FOG);
 	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogfv(GL_FOG_COLOR, fogColor);
 	glFogf(GL_FOG_START, 10.0f);
@@ -486,6 +489,8 @@ int main(int argc,char* argv[]) {
 	glutSpecialFunc(special);
 	glutKeyboardFunc(key);
 	glutIdleFunc(idle);
+
+	LoadOBJ("../objects/barn.obj");
 
 	generateEntities();
 

@@ -1,0 +1,41 @@
+Final Project
+
+Jackson Markowski
+CSCI4229/5229 Fall 2017
+
+To compile and run: 
+  $cd src 
+  $make
+  $./project
+
+Key bindings
+  t          Toggles time of day (day/night)
+  w,a,s,d    Move the spaceship around (x and z)
+  e,q        Move the spaceship up and down (y)
+  W,A,S,D    Move camera around in first person
+ 
+  p          Toggles view modes (first person, follow, and perspective)
+  arrows     Change view angle in first person and perspective
+  PgDn/PgUp  Zoom in and out
+  x          Toggle axes
+  i	     Toggles info
+  l          Toggles main light
+  ESC        Exit
+
+What you should take note of:
+  - Spaceship design
+  - Moving "lights" on the spaceship
+  - Spotlight underneath the spaceship
+  - Randomly generated smoke from the crashed spaceship
+  - Ability to change the time of day
+  - Ability to move the spaceship
+  - The third camera mode that automatically follows the spaceship movements
+
+Remains to be done:
+  - Fix transparent cone/spotlight under spaceship
+  - Make smoke more randomly generated
+  - Fix smoke lighting/material
+  - Add stars in the night sky
+  - Smooth transition between night and day
+  - Fog/map edge
+  - Add more small details

@@ -24,7 +24,7 @@ endif
 
 # Dependencies
 CG_Project.o: CG_Project.cpp CSCIx229.h Entity.cpp Spaceship.cpp SmokeCloud.cpp Terrain.cpp Barn.cpp Fence.cpp Cow.cpp Tree.cpp Grass.cpp Camera.cpp
-Entity.o: entity.cpp entity.h
+Entity.o: Entity.cpp Entity.h
 Spaceship.o: Spaceship.cpp Spaceship.h
 SmokeCloud.o: SmokeCloud.cpp SmokeCloud.h
 Terrain.o: Terrain.cpp Terrain.h

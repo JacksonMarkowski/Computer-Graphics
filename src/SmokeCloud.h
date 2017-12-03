@@ -11,6 +11,9 @@ struct cloudPiece {
 
 class SmokeCloud : public Entity {
 	private:
+		double increasingTime = 1.5;
+		double elapsedTime = 0;
+		
 		struct cloudPiece pieces[5];
 		void drawSmokePiece(double x, double y, double z, double r);
 		void Vertex(double th,double ph);

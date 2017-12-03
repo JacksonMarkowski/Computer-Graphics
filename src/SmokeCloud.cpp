@@ -17,7 +17,7 @@ SmokeCloud::SmokeCloud() {
 }
 
 SmokeCloud::~SmokeCloud() {
-	
+
 }
 
 void SmokeCloud::draw() {
@@ -49,12 +49,17 @@ void SmokeCloud::loadComponents() {
 }
 
 int SmokeCloud::update(double time) {
+	elapsedTime += time;
+
 	double timeSec = time/1000.0;
-	double scaleInc = timeSec / 10.0;
+
 	transformation.pos.y += timeSec / 4;
-	transformation.scale.x -= scaleInc;
-	transformation.scale.y -= scaleInc;
-	transformation.scale.z -= scaleInc;
+
+	double scaleScale = elapsedTime/1000.0 > increasingTime ? -1 : 4;
+	double scaleInc = scaleScale * timeSec / 10.0;
+	transformation.scale.x += scaleInc;
+	transformation.scale.y += scaleInc;
+	transformation.scale.z += scaleInc;
 	if (transformation.scale.x < .1 || transformation.scale.y < .1 || transformation.scale.z < .1) return 0;
 	else return 1;
 }

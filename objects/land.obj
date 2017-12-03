@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'land.blend'
 # www.blender.org
-mtllib ../materials/Land.mtl
+mtllib ../materials/land.mtl
 o Plane
 v -8.808221 1.216039 8.242496
 v 8.060500 -0.061590 8.052589
