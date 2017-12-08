@@ -26,9 +26,9 @@ void SmokeCloud::draw() {
 
 	glColor3f(1, 1, 1);
 
-	float ambient[] = {0.7,0.7,0.7,0.7};
-	float diffuse[] = {0.9,0.9,0.9,0.9};
-	float specular[] = {0.9,0.9,0.9,0.00};
+	float ambient[] = {0.7,0.7,0.85,0.9};
+	float diffuse[] = {0.7,0.7,0.85,0.9};
+	float specular[] = {0.1,0.1,0.1,0.00};
 	float emission[] = {0.0,0.0,0.0,0.0};
 	float shine = 5.0;
 	glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT, ambient);
@@ -55,7 +55,7 @@ int SmokeCloud::update(double time) {
 
 	transformation.pos.y += timeSec / 4;
 
-	double scaleScale = elapsedTime/1000.0 > increasingTime ? -1 : 4;
+	double scaleScale = elapsedTime/1000.0 > increasingTime ? -.9 : 3.1;
 	double scaleInc = scaleScale * timeSec / 10.0;
 	transformation.scale.x += scaleInc;
 	transformation.scale.y += scaleInc;

@@ -28,6 +28,7 @@ class Camera {
 		void incPH(int value);
 		void rotate(int th, int ph);
 		void setCamPos(double camX, double camY, double camZ);
+		double getHorRotFromCamPos(Ver3d fromPos);
 		//void incCamPos(double camXInc, double camYInc, double camZInc);
 		void moveCamPosForward(double forwardInc);
 		void moveCamPosSideways(double sidewaysInc);
@@ -57,10 +58,10 @@ void Camera::updateView(Ver3d followPos) {
 		}
 		case PERSPECTIVE: {
 			//Calculate postion of view based on viewing the origin
-			double ex = -2*dim*Sin(th)*Cos(ph);
-			double ey = +2*dim        *Sin(ph);
-			double ez = +2*dim*Cos(th)*Cos(ph);
-			gluLookAt(ex,ey,ez , 0,0,0 , 0,Cos(ph),0);
+			camX = -2*dim*Sin(th)*Cos(ph);
+			camY = +2*dim        *Sin(ph);
+			camZ = +2*dim*Cos(th)*Cos(ph);
+			gluLookAt(camX,camY,camZ , 0,0,0 , 0,Cos(ph),0);
 			break;
 		}
 	}
@@ -110,6 +111,12 @@ void Camera::setCamPos(double camX, double camY, double camZ) {
 	this->camX = camX;
 	this->camY = camY;
 	this->camZ = camZ;
+}
+
+double Camera::getHorRotFromCamPos(Ver3d fromPos) {
+	//ToDO: I believe this could be redone in a better way, but I'm not smart enough to figure it out
+	if ((fromPos.z - camZ) > 0) return 180.0 / 3.14159 * atan((camX - fromPos.x) / (fromPos.z - camZ)) + 180;
+	else return 180.0/3.14159*atan((camX - fromPos.x)/(fromPos.z - camZ));
 }
 /*
 void Camera::incCamPos(double camXInc, double camYInc, double camZInc) {

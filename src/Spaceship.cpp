@@ -54,7 +54,7 @@ void Spaceship::update(double elapsedTime) {
 			}
 		}
 	}
-	transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
+	//transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
 
 }
 
@@ -98,7 +98,7 @@ void Spaceship::setBeamOnOff(int lights) {
 	this->lights = lights;
 }
 
-void Spaceship::drawBeam() {
+void Spaceship::drawBeam(double startDeg) {
 	if (lights) {
 		glPushMatrix();
 		applyTrans3d(transformation);
@@ -138,7 +138,7 @@ void Spaceship::drawBeam() {
 		//Draws the frustum by drawing the next vertex rad over
 		glDisable(GL_COLOR_MATERIAL);
 		glBegin(GL_QUAD_STRIP);
-		for (int i = 0; i <= 360; i += 4) {
+		for (int i = startDeg; i < 360+startDeg; i += 2) {
 		  //double color = (cos(i)*cos(i) + 1) / 2;
 		  //glColor3f(color, color, color);
 		  glNormal3d(Cos(i),normalY,Sin(i));
@@ -147,6 +147,11 @@ void Spaceship::drawBeam() {
 		  glNormal3d(Cos(i),1,Sin(i));
 		  glTexCoord2f(i/360, 0.0); glVertex3d(Cos(i) * r1, 0-height, Sin(i) * r1);
 		}
+		glNormal3d(Cos(startDeg),normalY,Sin(startDeg));
+		glTexCoord2f(startDeg/360, 1.0); glVertex3d(Cos(startDeg) * r2, -.72, Sin(startDeg) * r2);
+		glNormal3d(Cos(startDeg),1,Sin(startDeg));
+		glTexCoord2f(startDeg/360, 0.0); glVertex3d(Cos(startDeg) * r1, 0-height, Sin(startDeg) * r1);
+		
 		glEnd();
 		glEnable(GL_COLOR_MATERIAL);
 		glPopMatrix();

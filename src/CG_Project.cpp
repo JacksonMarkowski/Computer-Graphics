@@ -142,6 +142,7 @@ void display() {
 
 	land.draw();
 
+
 	/*
 	for (SmokeCloud* c : smokeClouds) {
 		if (!c->update(elapsedTime)) {
@@ -151,11 +152,10 @@ void display() {
 	}*/
 	for (std::list<SmokeCloud*>::iterator it = smokeClouds.begin(); it != smokeClouds.end(); ++it) {
 		if (!(*it)->update(elapsedTime)) {
-			SmokeCloud* c = (*it);
+			delete * it;  
 			it = smokeClouds.erase(it);
 			(*it)->update(elapsedTime);
 			(*it)->draw();
-			//delete(c);
 		} else (*it)->draw();
 	}
 
@@ -163,7 +163,7 @@ void display() {
 		e->update(elapsedTime);
 		e->draw();
 	}
-	mainSpaceship.drawBeam();
+	mainSpaceship.drawBeam(camera.getHorRotFromCamPos(mainSpaceship.getPos()));
 	//ball(2,1,0,.25);
 	//ball(2.45,1,0,.45);
 
@@ -209,12 +209,17 @@ void display() {
 }
 
 void generateSmokeClouds() {
-	double timeBetweenGeneration = 2500.0;
+	double timeBetweenGeneration = 1200.0;
 	elapsedSmokeGeneration += elapsedTime;
 	while (elapsedSmokeGeneration > timeBetweenGeneration) {
+		srand(time(NULL));
+		double x = ((rand() % 3) - 1)/3.0;
+		double z = ((rand() % 3) - 1)/3.0;
+		double ry = (rand() % 360);
+		double rx = (rand() % 38);
 		SmokeCloud* cloud = new SmokeCloud();
 
-		cloud->setTrans3d(Trans3d(.35,.7,-1.7,.11,.11,.11,0,0,0));
+		cloud->setTrans3d(Trans3d(.29+x,.9,-1.7+z,.11,.11,.11,rx,ry,0));
 
 		smokeClouds.push_back(cloud);
 

@@ -40,7 +40,7 @@ class Spaceship : public Entity {
 		void draw();
 		void loadComponents();
 		void setBeamOnOff(int lights);
-		void drawBeam();
+		void drawBeam(double startDeg);
 };
 
 #endif

@@ -12,7 +12,7 @@ Key bindings
   t          Toggles time of day (day/night)
   w,a,s,d    Move the spaceship around (x and z)
   e,q        Move the spaceship up and down (y)
-  W,A,S,D    Move camera around in first person
+  W,A,S,D    Move camera around in first person/follow mode
  
   p          Toggles view modes (first person, follow, and perspective)
   arrows     Change view angle in first person and perspective
@@ -32,9 +32,6 @@ What you should take note of:
   - The third camera mode that automatically follows the spaceship movements
 
 Remains to be done:
-  - Fix transparent cone/spotlight under spaceship
-  - Make smoke more randomly generated
-  - Fix smoke lighting/material
   - Add stars in the night sky
   - Smooth transition between night and day
   - Fog/map edge
