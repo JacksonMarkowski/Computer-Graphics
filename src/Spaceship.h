@@ -13,6 +13,8 @@ class Spaceship : public Entity {
 		int metalSecTex, domeRingTex, domeTex;
 		int lights = 0;
 		struct light fakeLightI[8];
+		int beamTransition = 0;
+		double beamHeight = 7.0;
 		void init(int lightsOn);
 
 		void drawWingPanel(Trans3d transform, int texture);

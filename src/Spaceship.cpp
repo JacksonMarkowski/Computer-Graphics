@@ -56,6 +56,20 @@ void Spaceship::update(double elapsedTime) {
 	}
 	transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
 
+	if (beamTransition) {
+		//printf("h\n");
+		double beamHeightChange = elapsedTime/400.0 * 7.0;
+		//printf("%f\n", beamTransition * beamHeightChange);
+		beamHeight += beamTransition * beamHeightChange;
+		if (beamHeight >= 7) {
+			beamHeight = 7;
+			beamTransition = 0;
+		} else if (beamHeight <= 0) {
+			beamHeight = 0;
+			beamTransition = 0;
+		}
+	}
+
 }
 
 void Spaceship::draw() {
@@ -95,43 +109,44 @@ void Spaceship::loadComponents() {
 }
 
 void Spaceship::setBeamOnOff(int lights) {
+	if (this->lights && !lights) beamTransition = -1;
+	else if (!this->lights && lights) beamTransition = 1;
 	this->lights = lights;
 }
 
 void Spaceship::drawBeam(double startDeg) {
-	if (lights) {
+	if (lights || beamTransition) {
 		glPushMatrix();
 		Trans3d noRot = transformation;
 		noRot.rot.y = 0;
 		applyTrans3d(noRot);
 
-		float Ambient[] = {.188,.78,.81,1.0};
-		float Diffuse[] = {.188,.78,.81,1.0};
-		float Specular[] = {.188,.78,.81,1.0};
-		//  Light position
-		float Position[]  = {(float)0,(float)-.72,(float)0,1.0};
+		if (beamHeight > 3) {
+			float Ambient[] = {.188,.78,.81,1.0};
+			float Diffuse[] = {.188,.78,.81,1.0};
+			float Specular[] = {.188,.78,.81,1.0};
+			float Position[]  = {(float)0,(float)-.72,(float)0,1.0};
 
-		glEnable(GL_NORMALIZE);
-		glEnable(GL_LIGHTING);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,0);
+			glEnable(GL_NORMALIZE);
+			glEnable(GL_LIGHTING);
+			glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,0);
+			
+			glEnable(GL_LIGHT1);
+			glLightfv(GL_LIGHT1,GL_AMBIENT ,Ambient);
+			glLightfv(GL_LIGHT1,GL_DIFFUSE ,Diffuse);
+			glLightfv(GL_LIGHT1,GL_SPECULAR,Specular);
+			glLightfv(GL_LIGHT1,GL_POSITION,Position);
+			glLightf(GL_LIGHT1,GL_SPOT_CUTOFF, 90.0);
+			GLfloat spotDirection[] = {0.0,-3.0,0.0};
+			glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION, spotDirection);
+			glLightf(GL_LIGHT1,GL_SPOT_EXPONENT, 4);
+		} else {
+			glDisable(GL_LIGHT1);
+		}
 
-		//glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-		//glEnable(GL_COLOR_MATERIAL);
 		
-		glEnable(GL_LIGHT1);
-		// Set ambient, diffuse, specular components and position of light 0
-		glLightfv(GL_LIGHT1,GL_AMBIENT ,Ambient);
-		glLightfv(GL_LIGHT1,GL_DIFFUSE ,Diffuse);
-		glLightfv(GL_LIGHT1,GL_SPECULAR,Specular);
-		glLightfv(GL_LIGHT1,GL_POSITION,Position);
-		glLightf(GL_LIGHT1,GL_SPOT_CUTOFF, 90.0);
-		GLfloat spotDirection[] = {0.0,-3.0,0.0};
-		glLightfv(GL_LIGHT1,GL_SPOT_DIRECTION, spotDirection);
-		glLightf(GL_LIGHT1,GL_SPOT_EXPONENT, 4);
 
-		
-
-		double r1 = 5;
+		double r1 = beamHeight * .7143;
 		double r2 = .4;
 		double height = 7;
 		double normalY = atan((r1-r2)/height)*2/3.1415926;
@@ -147,16 +162,18 @@ void Spaceship::drawBeam(double startDeg) {
 		  glTexCoord2f(i/360, 1.0); glVertex3d(Cos(i) * r2, -.72, Sin(i) * r2);
 
 		  glNormal3d(Cos(i),1,Sin(i));
-		  glTexCoord2f(i/360, 0.0); glVertex3d(Cos(i) * r1, 0-height, Sin(i) * r1);
+		  glTexCoord2f(i/360, 0.0); glVertex3d(Cos(i) * r1, 0-beamHeight, Sin(i) * r1);
 		}
 		glNormal3d(Cos(startDeg),normalY,Sin(startDeg));
 		glTexCoord2f(startDeg/360, 1.0); glVertex3d(Cos(startDeg) * r2, -.72, Sin(startDeg) * r2);
 		glNormal3d(Cos(startDeg),1,Sin(startDeg));
-		glTexCoord2f(startDeg/360, 0.0); glVertex3d(Cos(startDeg) * r1, 0-height, Sin(startDeg) * r1);
+		glTexCoord2f(startDeg/360, 0.0); glVertex3d(Cos(startDeg) * r1, 0-beamHeight, Sin(startDeg) * r1);
 		
 		glEnd();
 		glEnable(GL_COLOR_MATERIAL);
 		glPopMatrix();
+	} else {
+		glDisable(GL_LIGHT1);
 	}
 
 }

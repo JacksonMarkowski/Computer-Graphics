@@ -16,6 +16,7 @@
 int printInfo=0;  //  Print info
 int axes=0;       //  Display axes
 int light=1;      //  Lighting
+int beamLight=1;
 int dayTime = 1;
 int viewMode = 2;
 
@@ -30,8 +31,6 @@ float diffuse   =  70;  // Diffuse intensity (%)
 float specular  =   65;  // Specular intensity (%)
 float ylight  =   1.4;  // Elevation of light
 
-int metalTex;
-
 double currentTime = 0;
 double elapsedTime = 0;
 
@@ -39,13 +38,22 @@ double elapsedSmokeGeneration = 0;
 
 int inTimeOfDayTransition = 0;
 
+int inScene = 0;
+int currentScene = 0;
+double currentSceneTime = 0;
+
 std::list<Entity*> entities;
 std::list<SmokeCloud*> smokeClouds;
+
 Spaceship mainSpaceship;
+
+Cow abductedCow;
+
 Terrain land;
 Camera camera;
 
 void enableFog(GLfloat* fogColor);
+void toggleTimeOfDay();
 
 struct SkyValues {
 	GLclampf skyColor[4];
@@ -144,7 +152,7 @@ void display() {
 		float Position[]  = {(float)(distance*Cos(45)),ylight,(float)(distance*Sin(45)),1.0};
 		//  Draw light position as ball (still no lighting here)
 		glColor3f(1,1,1);
-		ball(Position[0],Position[1],Position[2] , 0.1);
+		ball(Position[0],Position[1],Position[2] , 0.15);
 		//  OpenGL should normalize normal vectors
 		glEnable(GL_NORMALIZE);
 		//  Enable lighting
@@ -171,14 +179,8 @@ void display() {
 
 	land.draw();
 
+	abductedCow.draw();
 
-	/*
-	for (SmokeCloud* c : smokeClouds) {
-		if (!c->update(elapsedTime)) {
-			smokeClouds.remove(c);
-			//free(c);
-		} else c->draw();
-	}*/
 	for (std::list<SmokeCloud*>::iterator it = smokeClouds.begin(); it != smokeClouds.end(); ++it) {
 		if (!(*it)->update(elapsedTime)) {
 			delete * it;  
@@ -192,11 +194,9 @@ void display() {
 		e->update(elapsedTime);
 		e->draw();
 	}
-	mainSpaceship.drawBeam(camera.getHorRotFromCamPos(mainSpaceship.getPos()));
-	//ball(2,1,0,.25);
-	//ball(2.45,1,0,.45);
 
-	//  Draw axes - no lighting from here on
+	mainSpaceship.drawBeam(camera.getHorRotFromCamPos(mainSpaceship.getPos()));
+
 	glDisable(GL_LIGHTING);
 	glColor3f(1,1,1);
 	if (axes) {
@@ -238,17 +238,17 @@ void display() {
 }
 
 void generateSmokeClouds() {
-	double timeBetweenGeneration = 1200.0;
+	double timeBetweenGeneration = 800.0;
 	elapsedSmokeGeneration += elapsedTime;
 	while (elapsedSmokeGeneration > timeBetweenGeneration) {
 		srand(time(NULL));
-		double x = ((rand() % 3) - 1)/3.0;
-		double z = ((rand() % 3) - 1)/3.0;
+		double x = ((rand() % 3) - 1)/5.0;
+		double z = ((rand() % 3) - 1)/7.0;
 		double ry = (rand() % 360);
-		double rx = (rand() % 38);
+		double rz = (rand() % 38);
 		SmokeCloud* cloud = new SmokeCloud();
 
-		cloud->setTrans3d(Trans3d(.29+x,.9,-1.7+z,.11,.11,.11,rx,ry,0));
+		cloud->setTrans3d(Trans3d(.32+x,.9,-1.7+z,.11,.11,.11,0,ry,rz));
 
 		smokeClouds.push_back(cloud);
 
@@ -275,14 +275,12 @@ void handleTimeOfDayTransition() {
 		currentTimeSky.fogColor[i] += incValue * (toSky.fogColor[i] - fromSky.fogColor[i]);
 
 		if ((currentTimeSky.skyColor[i] > toSky.skyColor[i] && currentTimeSky.skyColor[i] > fromSky.skyColor[i]) || (currentTimeSky.skyColor[i] < toSky.skyColor[i] && currentTimeSky.skyColor[i] < fromSky.skyColor[i])) {
-			//currentTimeSky.skyColor[i] = toSky.skyColor[i];
 			currentTimeSky = toSky;
 			inTimeOfDayTransition = 0;
 			currentTimeSky.applyValues();
 			return;
 		}
 		if ((currentTimeSky.fogColor[i] > toSky.fogColor[i] && currentTimeSky.fogColor[i] > fromSky.fogColor[i]) || (currentTimeSky.fogColor[i] < toSky.fogColor[i] && currentTimeSky.fogColor[i] < fromSky.fogColor[i])) {
-			//currentTimeSky.fogColor[i] = toSky.fogColor[i];
 			currentTimeSky = toSky;
 			inTimeOfDayTransition = 0;
 			currentTimeSky.applyValues();
@@ -293,6 +291,93 @@ void handleTimeOfDayTransition() {
 	currentTimeSky.diffuseSky += incValue * (toSky.diffuseSky - fromSky.diffuseSky);
 	currentTimeSky.specularSky += incValue * (toSky.specularSky - fromSky.specularSky);
 	currentTimeSky.applyValues();
+}
+
+void handleScenes() {
+	currentSceneTime += elapsedTime;
+	int enterScene = currentScene;
+	switch (currentScene) {
+		case 0:
+			dayTime = 1;
+			currentTimeSky = dayTimeSky;
+			dayTimeSky.applyValues();
+
+			camera.setViewMode(Camera::FOLLOW);
+			camera.setCamPos(4.50,2.90,2.898076);
+
+			toggleTimeOfDay();
+
+			mainSpaceship.setPos(Ver3d(-13.1,3.2,-.3));
+			mainSpaceship.setBeamOnOff(0);
+			beamLight = 0;
+
+			abductedCow.setTrans3d(Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
+
+			currentScene++;
+			break;
+		case 1:
+			mainSpaceship.incX((elapsedTime / 1000) * 3.04);
+			if (currentSceneTime >= 3000) currentScene++;
+			break;
+		case 2:
+			mainSpaceship.incY((elapsedTime / 1000) * -1.0);
+			mainSpaceship.incX((elapsedTime / 1000) * 3.02);
+			if (currentSceneTime >= 2000) currentScene++;
+			break;
+		case 3:
+			mainSpaceship.setBeamOnOff(1);
+			currentScene++;
+			break;
+		case 4:
+			if (currentSceneTime >= 400) currentScene++;
+			break;
+		case 5: {
+			abductedCow.incY((elapsedTime / 1000) * .44);
+			double scaleInc = (elapsedTime / 2500) * -.042;
+			abductedCow.incScale(scaleInc, scaleInc, scaleInc);
+			if (currentSceneTime >= 2800) currentScene++;
+			break;
+		}
+		case 6: {
+			double incY = (elapsedTime / 1000) * 0.2;
+			double incZ = (elapsedTime / 1000) * -0.8;
+			mainSpaceship.incY(incY);
+			mainSpaceship.incZ(incZ);
+			abductedCow.incY(incY);
+			abductedCow.incZ(incZ);
+			if (currentSceneTime >= 1200) currentScene++;
+			break;
+		}
+		case 7:
+			mainSpaceship.setBeamOnOff(0);
+			currentScene++;
+			break;
+		case 8: {
+			double incX = (elapsedTime / 1000) * -0.5;
+			double incY = (elapsedTime / 1000) * 0.3;
+			double incZ = (elapsedTime / 1000) * -2.5;
+			mainSpaceship.incX(incX);
+			mainSpaceship.incY(incY);
+			mainSpaceship.incZ(incZ);
+			abductedCow.incX(incX);
+			abductedCow.incY(incY);
+			abductedCow.incZ(incZ);
+			if (currentSceneTime >= 5000) currentScene++;
+			break;
+		}
+		case 9:
+			if (currentSceneTime >= 1000) currentScene++;
+			break;
+		case 10:
+			mainSpaceship.setTrans3d(Trans3d(0,1.5,0,.5,.5,.5,0,0,0));
+			mainSpaceship.setBeamOnOff(1);
+			beamLight = 1;
+
+			abductedCow.setTrans3d(Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
+			inScene = 0;
+			break;
+	}
+	if (currentScene != enterScene) currentSceneTime = 0;
 }
 
 /*
@@ -306,6 +391,7 @@ void idle() {
 
 	generateSmokeClouds();
 	if (inTimeOfDayTransition) handleTimeOfDayTransition();
+	if (inScene) handleScenes();
 
 	glutPostRedisplay();
 }
@@ -314,19 +400,14 @@ void enableFog(GLfloat* fogColor) {
 	glEnable(GL_FOG);
 	glFogf(GL_FOG_MODE, GL_LINEAR);
 	glFogfv(GL_FOG_COLOR, fogColor);
+	//glFogf(GL_FOG_COORD_SRC, GL_FOG_COORD);
 	glFogf(GL_FOG_START, 10.0f);
-	glFogf(GL_FOG_END, 15.0f);
+	glFogf(GL_FOG_END, 14.0f);
 }
 
 void toggleTimeOfDay() {
 	dayTime = 1-dayTime;
 	inTimeOfDayTransition = 1;
-	/*
-	if (dayTime) {
-		dayTimeSky.applyValues();
-	} else {
-		nightTimeSky.applyValues();
-	}*/
 }
 
 /*
@@ -444,9 +525,17 @@ void key(unsigned char ch,int x,int y) {
 	else if (ch == 'S') {
 		camera.moveCamPosForward(-.2);
 	}
+	else if (ch=='b' || ch=='B') {
+		beamLight = 1-beamLight;
+		mainSpaceship.setBeamOnOff(beamLight);
+	}
 	//Toggle the time of day(night or day)
 	else if (ch=='t' || ch=='T') {
 		toggleTimeOfDay();
+	}
+	else if (ch==32) {
+		inScene = 1;
+		currentScene = 0;
 	}
 
 	camera.updateProjection();
@@ -494,6 +583,8 @@ void generateEntities() {
 	newEntity(new Fence(), Trans3d(-1.461,.57,-1.733,.08,.08,.08,4,0,-3));
 	newEntity(new Fence(), Trans3d(-.395,.52,-1.733,.08,.08,.08,0,5,-20));
 
+	abductedCow.loadComponents();
+	abductedCow.setTrans3d(Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
 	newEntity(new Cow(), Trans3d(-.395,.78,-3,.075,.075,.075,8,5,-5));
 	newEntity(new Cow(), Trans3d(-.335,.793,-3.6,.04,.04,.04,8,10,-5));
 	newEntity(new Cow(), Trans3d(-1.8,.70,-2.3,.075,.075,.075,8,-35,0));
@@ -501,7 +592,7 @@ void generateEntities() {
 	newEntity(new Cow(), Trans3d(2.3,.18,-3.2,.075,.075,.075,15,90,0));
 	newEntity(new Cow(), Trans3d(.6,.58,-4.1,.075,.075,.075,15,115,0));
 	newEntity(new Cow(), Trans3d(1.3,.2,-1.7,.075,.075,.075,13,45,0));
-	newEntity(new Cow(), Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
+	//newEntity(new Cow(), Trans3d(2.2,-.3,-.2,.075,.075,.075,13,11,0));
 	newEntity(new Cow(), Trans3d(1.2,-.290,.8,.075,.075,.075,-13,-170,9));
 	newEntity(new Cow(), Trans3d(3.4,-.16,-1.5,.071,.071,.071,-20,150,10));
 

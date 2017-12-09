@@ -33,6 +33,14 @@ void Entity::setTrans3d(Trans3d transformation) {
 	this->transformation = transformation;
 }
 
+void Entity::setPos(Ver3d pos) {
+	this->transformation.pos = pos;
+}
+
+Ver3d Entity::getPos() {
+	return transformation.pos;
+}
+
 double Entity::incX(double x) {
 	transformation.pos.x += x;
 	return transformation.pos.x;
@@ -48,8 +56,11 @@ double Entity::incZ(double z) {
 	return transformation.pos.y;
 }
 
-Ver3d Entity::getPos() {
-	return transformation.pos;
+Ver3d Entity::incScale(double x, double y, double z) {
+	transformation.scale.x += x;
+	transformation.scale.y += y;
+	transformation.scale.z += z;
+	return transformation.scale;
 }
 
 void Entity::applyTrans3d(Trans3d transform) {

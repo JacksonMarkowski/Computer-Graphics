@@ -18,10 +18,12 @@ class Entity {
 		virtual void loadComponents();
 		void update(double elapsedTime);
 		void setTrans3d(Trans3d transformation);
+		void setPos(Ver3d pos);
+		Ver3d getPos();
 		double incX(double x);
 		double incY(double y);
 		double incZ(double z);
-		Ver3d getPos();
+		Ver3d incScale(double x, double y, double z);
 };
 
 #endif
