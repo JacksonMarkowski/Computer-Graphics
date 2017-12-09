@@ -54,7 +54,7 @@ void Spaceship::update(double elapsedTime) {
 			}
 		}
 	}
-	//transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
+	transformation.rot.y = transformation.rot.y + fmod(90*elapsedTime/1000.0,360.0);
 
 }
 
@@ -101,7 +101,9 @@ void Spaceship::setBeamOnOff(int lights) {
 void Spaceship::drawBeam(double startDeg) {
 	if (lights) {
 		glPushMatrix();
-		applyTrans3d(transformation);
+		Trans3d noRot = transformation;
+		noRot.rot.y = 0;
+		applyTrans3d(noRot);
 
 		float Ambient[] = {.188,.78,.81,1.0};
 		float Diffuse[] = {.188,.78,.81,1.0};

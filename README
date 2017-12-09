@@ -30,9 +30,4 @@ What you should take note of:
   - Ability to change the time of day
   - Ability to move the spaceship
   - The third camera mode that automatically follows the spaceship movements
-
-Remains to be done:
-  - Add stars in the night sky
   - Smooth transition between night and day
-  - Fog/map edge
-  - Add more small details

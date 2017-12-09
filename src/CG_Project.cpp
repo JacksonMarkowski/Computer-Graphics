@@ -25,9 +25,9 @@ int inc       =  10;  // Ball increment
 int smooth    =   1;  // Smooth/Flat shading
 int local     =   0;  // Local Viewer Model
 int emission  =   0;  // Emission intensity (%)
-int ambient   =  50;  // Ambient intensity (%)
-int diffuse   =  70;  // Diffuse intensity (%)
-int specular  =   65;  // Specular intensity (%)
+float ambient   =  50;  // Ambient intensity (%)
+float diffuse   =  70;  // Diffuse intensity (%)
+float specular  =   65;  // Specular intensity (%)
 float ylight  =   1.4;  // Elevation of light
 
 int metalTex;
@@ -37,11 +37,40 @@ double elapsedTime = 0;
 
 double elapsedSmokeGeneration = 0;
 
+int inTimeOfDayTransition = 0;
+
 std::list<Entity*> entities;
 std::list<SmokeCloud*> smokeClouds;
 Spaceship mainSpaceship;
 Terrain land;
 Camera camera;
+
+void enableFog(GLfloat* fogColor);
+
+struct SkyValues {
+	GLclampf skyColor[4];
+	GLfloat fogColor[4];
+	float ambientSky;
+	float diffuseSky;
+	float specularSky;
+	SkyValues() {}
+	void setValues(GLclampf skyRed, GLclampf skyGreen, GLclampf skyBlue, GLclampf skyAlpha, GLfloat fogRed, GLfloat fogGreen, GLfloat fogBlue, GLfloat fogAlpha, int ambient, int diffuse, int specular) {
+		skyColor[0] = skyRed; skyColor[1] = skyGreen; skyColor[2] = skyBlue; skyColor[3] = skyAlpha;
+		fogColor[0] = fogRed; fogColor[1] = fogGreen; fogColor[2] = fogBlue; fogColor[3] = fogAlpha;
+		ambientSky = ambient; diffuseSky = diffuse; specularSky = specular;
+	}
+	void applyValues() {
+		glClearColor( skyColor[0], skyColor[1], skyColor[2], skyColor[3]);
+		enableFog(fogColor); 
+		ambient = ambientSky;
+		diffuse = diffuseSky;
+		specular = specularSky;
+	}
+};
+
+SkyValues dayTimeSky;
+SkyValues nightTimeSky;
+SkyValues currentTimeSky;
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -227,6 +256,45 @@ void generateSmokeClouds() {
 	}
 }
 
+void handleTimeOfDayTransition() {
+	double incValue = elapsedTime/2500.0;
+	
+	//int count = 0;
+
+	SkyValues toSky;
+	SkyValues fromSky;
+	if (dayTime) {
+		toSky = dayTimeSky;
+		fromSky = nightTimeSky;
+	} else {
+		toSky = nightTimeSky;
+		fromSky = dayTimeSky;
+	}
+	for (int i = 0; i < 4; i++) {
+		currentTimeSky.skyColor[i] += incValue * (toSky.skyColor[i] - fromSky.skyColor[i]);
+		currentTimeSky.fogColor[i] += incValue * (toSky.fogColor[i] - fromSky.fogColor[i]);
+
+		if ((currentTimeSky.skyColor[i] > toSky.skyColor[i] && currentTimeSky.skyColor[i] > fromSky.skyColor[i]) || (currentTimeSky.skyColor[i] < toSky.skyColor[i] && currentTimeSky.skyColor[i] < fromSky.skyColor[i])) {
+			//currentTimeSky.skyColor[i] = toSky.skyColor[i];
+			currentTimeSky = toSky;
+			inTimeOfDayTransition = 0;
+			currentTimeSky.applyValues();
+			return;
+		}
+		if ((currentTimeSky.fogColor[i] > toSky.fogColor[i] && currentTimeSky.fogColor[i] > fromSky.fogColor[i]) || (currentTimeSky.fogColor[i] < toSky.fogColor[i] && currentTimeSky.fogColor[i] < fromSky.fogColor[i])) {
+			//currentTimeSky.fogColor[i] = toSky.fogColor[i];
+			currentTimeSky = toSky;
+			inTimeOfDayTransition = 0;
+			currentTimeSky.applyValues();
+			return;
+		}
+	}
+	currentTimeSky.ambientSky += incValue * (toSky.ambientSky - fromSky.ambientSky);
+	currentTimeSky.diffuseSky += incValue * (toSky.diffuseSky - fromSky.diffuseSky);
+	currentTimeSky.specularSky += incValue * (toSky.specularSky - fromSky.specularSky);
+	currentTimeSky.applyValues();
+}
+
 /*
  *  GLUT calls this routine when the window is resized
  */
@@ -237,6 +305,7 @@ void idle() {
 	elapsedTime = currentTime - previousTime;
 
 	generateSmokeClouds();
+	if (inTimeOfDayTransition) handleTimeOfDayTransition();
 
 	glutPostRedisplay();
 }
@@ -251,21 +320,13 @@ void enableFog(GLfloat* fogColor) {
 
 void toggleTimeOfDay() {
 	dayTime = 1-dayTime;
+	inTimeOfDayTransition = 1;
+	/*
 	if (dayTime) {
-		glClearColor( .73, .913, .968, 1);
-		GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
-		enableFog(fogColor); 
-		ambient   =  50;  // Ambient intensity (%)
-		diffuse   =  70;  // Diffuse intensity (%)
-		specular  =  65;  // Specular intensity (%)
+		dayTimeSky.applyValues();
 	} else {
-		glClearColor(.008,.008,.125,1);
-		GLfloat fogColor[4] = {.008f,.008f,.125f,1.0f};
-		enableFog(fogColor);
-		ambient   =  10;  // Ambient intensity (%)
-		diffuse   =  10;  // Diffuse intensity (%)
-		specular  =  45;  // Specular intensity (%)
-	}
+		nightTimeSky.applyValues();
+	}*/
 }
 
 /*
@@ -499,9 +560,10 @@ int main(int argc,char* argv[]) {
 
 	generateEntities();
 
-	glClearColor( .73, .913, .968, 1);
-	GLfloat fogColor[4] = {.71f,.913f,.968f,1.0f};
-	enableFog(fogColor);
+	dayTimeSky.setValues(.73, .913, .968, 1, .71,.913,.968,1.0, 50,75,65);
+	currentTimeSky.setValues(.73, .913, .968, 1, .71,.913,.968,1.0, 50,75,65);
+	nightTimeSky.setValues(.008,.008,.125,1, .008,.008,.125,1.0, 10,10,45);
+	dayTimeSky.applyValues();
 
 	//  Pass control to GLUT so it can interact with the user
 	ErrCheck("init");
