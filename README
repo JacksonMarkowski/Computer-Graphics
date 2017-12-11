@@ -20,7 +20,6 @@ Key bindings
   arrows     Change view angle in first person and perspective
   PgDn/PgUp  Zoom in and out
   x          Toggle axes
-  i	     Toggles info
   l          Toggles main light
   ESC        Exit
 

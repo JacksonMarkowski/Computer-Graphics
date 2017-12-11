@@ -13,7 +13,6 @@
 #include "Cow.h"
 #include "Camera.cpp"
 
-int printInfo=0;  //  Print info
 int axes=0;       //  Display axes
 int light=1;      //  Lighting
 int beamLight=1;
@@ -42,15 +41,12 @@ int inScene = 0;
 int currentScene = 0;
 double currentSceneTime = 0;
 
-std::list<Entity*> entities;
-std::list<SmokeCloud*> smokeClouds;
-
 Spaceship mainSpaceship;
-
 Cow abductedCow;
-
 Terrain land;
 Camera camera;
+std::list<Entity*> entities;
+std::list<SmokeCloud*> smokeClouds;
 
 void enableFog(GLfloat* fogColor);
 void toggleTimeOfDay();
@@ -142,7 +138,6 @@ void display() {
 	glShadeModel(smooth ? GL_SMOOTH : GL_FLAT);
 
 	//  Light switch
-	
 	if (light) {
 		//  Translate intensity to color vectors
 		float Ambient[]   = {(float)0.01*ambient ,(float)0.01*ambient ,(float)0.01*ambient ,1.0};
@@ -215,20 +210,6 @@ void display() {
 		Print("Y");
 		glRasterPos3d(0.0,0.0,len);
 		Print("Z");
-	}
-
-	
-	if (printInfo) {
-	//  Display parameters
-		glWindowPos2i(5,5);
-		//Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s Light=%s",
-		  //th,ph,dim,fov,mode?"Perpective":"Orthogonal",light?"On":"Off");
-		if (light) {
-			glWindowPos2i(5,45);
-			Print("Model=%s LocalViewer=%s Distance=%d Elevation=%.1f",smooth?"Smooth":"Flat",local?"On":"Off",distance,ylight);
-			glWindowPos2i(5,25);
-			Print("Ambient=%d  Diffuse=%d Specular=%d",ambient,diffuse,specular);
-		}
 	}
 
 	//  Render the scene and make it visible
@@ -415,31 +396,33 @@ void toggleTimeOfDay() {
  */
 void special(int key,int x,int y) {
 	//  Right arrow key - increase angle by 5 degrees
-	if (key == GLUT_KEY_RIGHT)
-		camera.incTH(5);
-	//  Left arrow key - decrease angle by 5 degrees
-	else if (key == GLUT_KEY_LEFT)
-		camera.incTH(-5);
-	//  Up arrow key - increase elevation by 5 degrees
-	else if (key == GLUT_KEY_UP)
-		camera.incPH(5);
-	//  Down arrow key - decrease elevation by 5 degrees
-	else if (key == GLUT_KEY_DOWN)
-		camera.incPH(-5);
-	//  PageUp key - increase dim
-	else if (key == GLUT_KEY_PAGE_DOWN)
-		camera.incDIM(0.1);
-	//  PageDown key - decrease dim
-	else if (key == GLUT_KEY_PAGE_UP)
-		camera.incDIM(-0.1);
-	//  Smooth color model
-	else if (key == GLUT_KEY_F1)
-		smooth = 1-smooth;
-	//  Local Viewer
-	else if (key == GLUT_KEY_F2)
-		local = 1-local;
-	else if (key == GLUT_KEY_F3)
-		distance = (distance==1) ? 5 : 1;
+	if (!inScene) {
+		if (key == GLUT_KEY_RIGHT)
+			camera.incTH(5);
+		//  Left arrow key - decrease angle by 5 degrees
+		else if (key == GLUT_KEY_LEFT)
+			camera.incTH(-5);
+		//  Up arrow key - increase elevation by 5 degrees
+		else if (key == GLUT_KEY_UP)
+			camera.incPH(5);
+		//  Down arrow key - decrease elevation by 5 degrees
+		else if (key == GLUT_KEY_DOWN)
+			camera.incPH(-5);
+		//  PageUp key - increase dim
+		else if (key == GLUT_KEY_PAGE_DOWN)
+			camera.incDIM(0.1);
+		//  PageDown key - decrease dim
+		else if (key == GLUT_KEY_PAGE_UP)
+			camera.incDIM(-0.1);
+		//  Smooth color model
+		else if (key == GLUT_KEY_F1)
+			smooth = 1-smooth;
+		//  Local Viewer
+		else if (key == GLUT_KEY_F2)
+			local = 1-local;
+		else if (key == GLUT_KEY_F3)
+			distance = (distance==1) ? 5 : 1;
+	}
 
 	camera.updateProjection();
 	//  Tell GLUT it is necessary to redisplay the scene
@@ -453,89 +436,80 @@ void key(unsigned char ch,int x,int y) {
 	//  Exit on ESC
 	if (ch == 27)
 		exit(0);
-	//Toggle axes
-	else if (ch == 'x' || ch == 'X')
-		axes = 1-axes;
-	//Toggle axes
-	else if (ch == 'i' || ch == 'I')
-		printInfo = 1-printInfo;
-	//Toggle main light(sun/moon)
-	else if (ch == 'l' || ch == 'L')
-		light = 1-light;
-	//Switch projection mode
-	else if (ch == 'p' || ch == 'P') {
-		int viewMode = camera.getViewMode();
-		viewMode++;
-		viewMode %= 3;
-		if (viewMode == 0) {
-			camera.setViewMode(Camera::FIRST_PERSON);
-			camera.rotate(-240,-30);
+	if (!inScene) {
+		//Toggle axes
+		if (ch == 'x' || ch == 'X')
+			axes = 1-axes;
+		//Toggle main light(sun/moon)
+		else if (ch == 'l' || ch == 'L')
+			light = 1-light;
+		//Switch projection mode
+		else if (ch == 'p' || ch == 'P') {
+			int viewMode = camera.getViewMode();
+			viewMode++;
+			viewMode %= 3;
+			if (viewMode == 0) {
+				camera.setViewMode(Camera::FIRST_PERSON);
+				camera.rotate(-240,-30);
+			}
+			else if (viewMode == 1) camera.setViewMode(Camera::FOLLOW);
+			else if (viewMode == 2) {
+				camera.setViewMode(Camera::PERSPECTIVE);
+				camera.rotate(-60,30);
+			}
 		}
-		else if (viewMode == 1) camera.setViewMode(Camera::FOLLOW);
-		else if (viewMode == 2) {
-			camera.setViewMode(Camera::PERSPECTIVE);
-			camera.rotate(-60,30);
+		//Move the spaceship forwards
+		else if (ch == 'w') {
+			mainSpaceship.incX(-.2);
 		}
-	}
-	/*
-	//Change field of view angle
-	else if (ch == '-' && ch>1)
-		//ToDo: set fov in camera
-		fov--;
-	else if (ch == '+' && ch<179)
-		fov++;
-	*/
-	//Move the spaceship forwards
-	else if (ch == 'w') {
-		mainSpaceship.incX(-.2);
-	}
-	//Move the spaceship left
-	else if (ch == 'a') {
-		mainSpaceship.incZ(.2);
-	}
-	//Move the spaceship right
-	else if (ch == 'd') {
-		mainSpaceship.incZ(-.2);
-	}
-	//Move the spaceship backwards
-	else if (ch == 's') {
-		mainSpaceship.incX(.2);
-	}
-	//Move the spaceship up
-	else if (ch == 'e' || ch == 'E') {
-		mainSpaceship.incY(.1);
-	}
-	//Mode the spaceship down
-	else if (ch == 'q' || ch == 'Q') {
-		mainSpaceship.incY(-.1);
-	}
-	//Move camera position forwards
-	else if (ch == 'W') {
-		camera.moveCamPosForward(.2);
-	}
-	//Move camera position left
-	else if (ch == 'A') {
-		camera.moveCamPosSideways(.2);
-	}
-	//Move camera position right
-	else if (ch == 'D') {
-		camera.moveCamPosSideways(-.2);
-	}
-	//Move camera position backwards
-	else if (ch == 'S') {
-		camera.moveCamPosForward(-.2);
-	}
-	else if (ch=='b' || ch=='B') {
-		beamLight = 1-beamLight;
-		mainSpaceship.setBeamOnOff(beamLight);
-	}
-	//Toggle the time of day(night or day)
-	else if (ch=='t' || ch=='T') {
-		toggleTimeOfDay();
-	}
-	else if (ch==32) {
-		inScene = 1;
-		currentScene = 0;
+		//Move the spaceship left
+		else if (ch == 'a') {
+			mainSpaceship.incZ(.2);
+		}
+		//Move the spaceship right
+		else if (ch == 'd') {
+			mainSpaceship.incZ(-.2);
+		}
+		//Move the spaceship backwards
+		else if (ch == 's') {
+			mainSpaceship.incX(.2);
+		}
+		//Move the spaceship up
+		else if (ch == 'e' || ch == 'E') {
+			mainSpaceship.incY(.1);
+		}
+		//Mode the spaceship down
+		else if (ch == 'q' || ch == 'Q') {
+			mainSpaceship.incY(-.1);
+		}
+		//Move camera position forwards
+		else if (ch == 'W') {
+			camera.moveCamPosForward(.2);
+		}
+		//Move camera position left
+		else if (ch == 'A') {
+			camera.moveCamPosSideways(.2);
+		}
+		//Move camera position right
+		else if (ch == 'D') {
+			camera.moveCamPosSideways(-.2);
+		}
+		//Move camera position backwards
+		else if (ch == 'S') {
+			camera.moveCamPosForward(-.2);
+		}
+		else if (ch=='b' || ch=='B') {
+			beamLight = 1-beamLight;
+			mainSpaceship.setBeamOnOff(beamLight);
+		}
+		//Toggle the time of day(night or day)
+		else if (ch=='t' || ch=='T') {
+			toggleTimeOfDay();
+		}
+		else if (ch==32) {
+			inScene = 1;
+			currentScene = 0;
+		}
 	}
 
 	camera.updateProjection();
