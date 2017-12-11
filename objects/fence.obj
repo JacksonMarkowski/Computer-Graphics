@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'FenceParts.blend'
 # www.blender.org
-mtllib ../materials/fence.mtl
+mtllib materials/fence.mtl
 o Cube_Cube.001
 v -0.450000 0.000000 0.450000
 v -0.540000 5.003672 0.540084

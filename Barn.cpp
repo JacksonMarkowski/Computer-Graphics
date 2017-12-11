@@ -19,6 +19,6 @@ void Barn::draw() {
 }
 
 void Barn::loadComponents() {
-	obj = LoadOBJ("../objects/barn.obj");
+	obj = LoadOBJ("objects/barn.obj");
 
 }

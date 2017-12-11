@@ -647,7 +647,7 @@ int main(int argc,char* argv[]) {
 	glutKeyboardFunc(key);
 	glutIdleFunc(idle);
 
-	LoadOBJ("../objects/barn.obj");
+	//LoadOBJ("../objects/barn.obj");
 
 	generateEntities();
 

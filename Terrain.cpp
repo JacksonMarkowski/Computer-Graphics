@@ -21,5 +21,5 @@ void Terrain::draw() {
 }
 
 void Terrain::loadComponents() {
-	obj = LoadOBJ("../objects/land.obj");
+	obj = LoadOBJ("objects/land.obj");
 }

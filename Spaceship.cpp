@@ -103,9 +103,9 @@ void Spaceship::draw() {
 }
 
 void Spaceship::loadComponents() {
-	metalSecTex = LoadTexBMP("../textures/MetalSec.bmp");
-	domeRingTex = LoadTexBMP("../textures/DomeRing.bmp");
-	domeTex = LoadTexBMP("../textures/MetalSecDome.bmp");
+	metalSecTex = LoadTexBMP("textures/MetalSec.bmp");
+	domeRingTex = LoadTexBMP("textures/DomeRing.bmp");
+	domeTex = LoadTexBMP("textures/MetalSecDome.bmp");
 }
 
 void Spaceship::setBeamOnOff(int lights) {

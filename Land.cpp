@@ -33,7 +33,7 @@ void Land::draw() {
 }
 
 void Land::loadComponents() {
-	landObj = LoadOBJ("../objects/land.obj");
+	landObj = LoadOBJ("objects/land.obj");
 }
 
 void Land::setTransformation(Trans3d transformation) {

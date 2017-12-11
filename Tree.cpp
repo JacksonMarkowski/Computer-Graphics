@@ -1,14 +1,14 @@
-#include "Cow.h"
+#include "Tree.h"
 
-Cow::Cow() {
+Tree::Tree() {
 	//loadComponents();
 }
 
-Cow::~Cow() {
-	
+Tree::~Tree() {
+
 }
 
-void Cow::draw() {
+void Tree::draw() {
 	glPushMatrix();
 	applyTrans3d(transformation);
 
@@ -18,7 +18,6 @@ void Cow::draw() {
 	glPopMatrix();
 }
 
-void Cow::loadComponents() {
-	obj = LoadOBJ("../objects/cow.obj");
-
+void Tree::loadComponents() {
+	obj = LoadOBJ("objects/tree.obj");
 }

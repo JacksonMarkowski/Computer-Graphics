@@ -22,7 +22,7 @@ void Fence::draw() {
 
 void Fence::loadComponents() {
 	if (fenceObj == 0) {
-		fenceObj = LoadOBJ("../objects/fence.obj");
+		fenceObj = LoadOBJ("objects/fence.obj");
 	}
 	obj = fenceObj;
 

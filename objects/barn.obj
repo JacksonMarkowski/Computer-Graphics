@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'barn.blend'
 # www.blender.org
-mtllib ../materials/barn.mtl
+mtllib materials/barn.mtl
 o Cube_Cube.002
 v -3.000000 0.000000 4.927984
 v -2.168000 6.175159 5.181870

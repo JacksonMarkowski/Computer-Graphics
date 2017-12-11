@@ -19,5 +19,5 @@ void Grass::draw() {
 }
 
 void Grass::loadComponents() {
-	obj = LoadOBJ("../objects/grass.obj");
+	obj = LoadOBJ("objects/grass.obj");
 }

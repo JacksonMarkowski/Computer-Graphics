@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'grass.blend'
 # www.blender.org
-mtllib ../materials/grass.mtl
+mtllib materials/grass.mtl
 o Cube.001_Cube.003
 v -0.591637 0.423048 0.243530
 v -0.601190 0.599780 0.143648

@@ -9,7 +9,9 @@ To compile and run:
   $./project
 
 Key bindings
+  [Space]    Shows animated scene
   t          Toggles time of day (day/night)
+  b          Toggles the spaceship light/tractor beam
   w,a,s,d    Move the spaceship around (x and z)
   e,q        Move the spaceship up and down (y)
   W,A,S,D    Move camera around in first person/follow mode
@@ -23,6 +25,7 @@ Key bindings
   ESC        Exit
 
 What you should take note of:
+  - Animated scene that incorporates all the aspects of the scene
   - Spaceship design
   - Moving "lights" on the spaceship
   - Spotlight underneath the spaceship
