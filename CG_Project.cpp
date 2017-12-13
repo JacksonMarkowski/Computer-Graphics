@@ -1,6 +1,7 @@
 #include "CSCIx229.h"
 #include "Trans3d.h"
 #include <list>
+#include <time.h>
 
 #include "Entity.h"
 #include "Spaceship.h"
@@ -621,7 +622,7 @@ int main(int argc,char* argv[]) {
 	glutKeyboardFunc(key);
 	glutIdleFunc(idle);
 
-	//LoadOBJ("../objects/barn.obj");
+	LoadOBJ("objects/barn.obj");
 
 	generateEntities();
 

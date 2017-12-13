@@ -4,7 +4,6 @@ Jackson Markowski
 CSCI4229/5229 Fall 2017
 
 To compile and run: 
-  $cd src 
   $make
   $./project
 
